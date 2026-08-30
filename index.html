@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>TRIA — three layers, one story</title>
+<meta name="description" content="An educational companion on integrated preventive health: blood biomarkers, genetics and pharmacogenomics. Not a diagnostic product.">
+<meta name="theme-color" content="#0b0f14">
+<meta name="color-scheme" content="dark light">
+
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="assets/icons/icon-192.png" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="TRIA">
+<meta name="mobile-web-app-capable" content="yes">
+
+<link rel="stylesheet" href="assets/css/app.css">
+</head>
+<body>
+
+<div class="app">
+  <header class="topbar">
+    <div class="brand">TRIA <span class="tag">three layers, one story</span></div>
+    <button class="iconbtn" type="button" id="themetoggle" title="Change appearance" aria-label="Change appearance">◐</button>
+  </header>
+
+  <main id="view" tabindex="-1">
+    <noscript>
+      <h1>TRIA</h1>
+      <p>This app needs JavaScript. Everything it does runs on your device — there is no server to fall back to.</p>
+      <p>The source is at <a href="https://github.com/mayurghule-ux/tria-precision-health">github.com/mayurghule-ux/tria-precision-health</a>.</p>
+    </noscript>
+  </main>
+
+  <nav class="tabbar" id="tabbar" aria-label="Sections"></nav>
+</div>
+
+<div class="sheet-backdrop" id="sheet-backdrop" data-open="0" aria-hidden="true">
+  <div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-label="More sections"></div>
+</div>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/views.js"></script>
+<script src="assets/js/views-tools.js"></script>
+<script src="assets/js/views-docs.js"></script>
+<script src="assets/js/app.js"></script>
+</body>
+</html>

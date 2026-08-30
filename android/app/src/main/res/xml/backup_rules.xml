@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Planner answers and doctor-brief notes live in WebView local storage.
+     They are backed up with the app so a device restore keeps them. -->
+<full-backup-content />

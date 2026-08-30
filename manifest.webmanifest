@@ -1,0 +1,27 @@
+{
+  "name": "TRIA — three layers, one story",
+  "short_name": "TRIA",
+  "description": "An educational companion on integrated preventive health: blood biomarkers, genetics and pharmacogenomics. Not a diagnostic product.",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0b0f14",
+  "theme_color": "#0b0f14",
+  "categories": ["health", "education", "medical"],
+  "lang": "en",
+  "dir": "ltr",
+  "icons": [
+    { "src": "assets/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "assets/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "assets/icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "PGx lab", "short_name": "PGx", "url": "index.html#/pgx",
+      "icons": [{ "src": "assets/icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "What should I test first?", "short_name": "Planner", "url": "index.html#/planner",
+      "icons": [{ "src": "assets/icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Doctor brief", "short_name": "Brief", "url": "index.html#/brief",
+      "icons": [{ "src": "assets/icons/icon-192.png", "sizes": "192x192" }] }
+  ]
+}

@@ -1,0 +1,39 @@
+name: Web smoke test
+
+on:
+  push:
+    branches: [main, "claude/**"]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    name: Render every section in Chromium
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - run: npm ci
+
+      - run: npx playwright install --with-deps chromium
+
+      - name: Serve the app
+        run: |
+          npx --yes http-server -p 8099 -s . &
+          npx --yes wait-on http://127.0.0.1:8099/index.html
+
+      # Fails the build on a console error, a failed request, horizontal
+      # overflow, a tap target under 40px, or a section that renders nothing.
+      - name: Smoke test
+        run: npm run smoke

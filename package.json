@@ -1,0 +1,14 @@
+{
+  "name": "tria-precision-health",
+  "version": "1.0.0",
+  "private": true,
+  "description": "TRIA \u2014 an educational companion on integrated preventive health. The app itself has no build step; this file exists only to run the browser smoke test.",
+  "scripts": {
+    "serve": "npx --yes http-server -p 8099 -s .",
+    "smoke": "node tools/smoke.mjs http://127.0.0.1:8099"
+  },
+  "devDependencies": {
+    "playwright": "1.56.1"
+  },
+  "license": "MIT"
+}
