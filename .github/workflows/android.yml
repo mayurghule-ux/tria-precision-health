@@ -28,8 +28,6 @@ jobs:
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
-        with:
-          build-root-directory: android
 
       # Present only if the repository has signing secrets configured. Without
       # them the build falls back to the runner's debug key, which installs but
@@ -68,6 +66,35 @@ jobs:
           cp android/app/build/outputs/apk/release/app-release.apk \
              "dist/tria-1.0.${{ github.run_number }}-release.apk"
           ls -lh dist
+
+      # The app claims to bundle the whole web app and to be incapable of using
+      # the network. Both are checked against the built APK rather than trusted.
+      - name: Verify the APK
+        run: |
+          set -euo pipefail
+          APK="dist/tria-1.0.${{ github.run_number }}-release.apk"
+
+          for f in assets/www/index.html \
+                   assets/www/sw.js \
+                   assets/www/manifest.webmanifest \
+                   assets/www/assets/css/app.css \
+                   assets/www/assets/js/app.js \
+                   assets/www/assets/js/data.js \
+                   assets/www/assets/js/views.js \
+                   assets/www/assets/js/views-tools.js \
+                   assets/www/assets/js/views-docs.js; do
+            unzip -l "$APK" | grep -q " $f$" || { echo "::error::missing from APK: $f"; exit 1; }
+          done
+          echo "Web bundle present in the APK."
+
+          AAPT2=$(ls -d "$ANDROID_HOME"/build-tools/*/aapt2 | sort -V | tail -1)
+          PERMS=$("$AAPT2" dump permissions "$APK")
+          echo "$PERMS"
+          if echo "$PERMS" | grep -q "android.permission.INTERNET"; then
+            echo "::error::APK requests INTERNET - the offline guarantee is broken"
+            exit 1
+          fi
+          echo "No INTERNET permission. The app cannot reach the network."
 
       - name: Upload APKs
         uses: actions/upload-artifact@v4
