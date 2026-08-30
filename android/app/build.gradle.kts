@@ -16,9 +16,15 @@ val syncWebAssets by tasks.registering(Sync::class) {
     description = "Bundles the TRIA web app into the APK's assets."
     group = "build"
 
-    from(rootProject.projectDir.parentFile) {
-        include("index.html", "manifest.webmanifest", "sw.js", "assets/**")
-    }
+    // Named explicitly rather than filtering the whole repository root: the
+    // build directory lives inside that root, so scanning it would make this
+    // task's own output part of its input.
+    val repoRoot = rootProject.projectDir.parentFile
+    from(File(repoRoot, "index.html"))
+    from(File(repoRoot, "manifest.webmanifest"))
+    from(File(repoRoot, "sw.js"))
+    from(File(repoRoot, "assets")) { into("assets") }
+
     into(webAssetsDir.map { it.dir("www") })
 }
 
@@ -33,8 +39,8 @@ android {
         minSdk = 24
         targetSdk = 35
         // CI passes the run number so successive builds are distinguishable.
-        versionCode = (System.getenv("TRIA_VERSION_CODE") ?: "1").toInt()
-        versionName = System.getenv("TRIA_VERSION_NAME") ?: "1.0"
+        versionCode = (providers.environmentVariable("TRIA_VERSION_CODE").orNull ?: "1").toInt()
+        versionName = providers.environmentVariable("TRIA_VERSION_NAME").orNull ?: "1.0"
     }
 
     sourceSets["main"].assets.srcDir(webAssetsDir)
