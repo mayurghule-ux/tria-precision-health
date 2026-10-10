@@ -1,0 +1,48 @@
+name: Publish QSI Offline APK
+
+# Takes the APK from an already-green "Build QSI Offline" run and attaches it to a
+# GitHub Release, which gives a direct .apk link that needs no unzip.
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: "Run id of a successful Build QSI Offline run"
+        required: true
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: qsi-offline-apk-*
+          run-id: ${{ inputs.run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          merge-multiple: true
+          path: dist
+
+      - name: Attach to a release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          APK=$(ls dist/*.apk | head -1)
+          VERSION=$(basename "$APK" .apk | sed 's/^QSI-Offline-//')
+          TAG="qsi-offline-v$VERSION"
+          if gh release view "$TAG" > /dev/null 2>&1; then
+            gh release upload "$TAG" "$APK" --clobber
+          else
+            gh release create "$TAG" "$APK" --title "QSI Offline $VERSION" \
+              --notes "Built by run ${{ inputs.run_id }}. Android 15 or newer. Install the .apk below."
+          fi
+          URL="https://github.com/$GH_REPO/releases/download/$TAG/$(basename "$APK")"
+          echo "Direct link: $URL"
+          echo "## Direct APK link" >> "$GITHUB_STEP_SUMMARY"
+          echo "$URL" >> "$GITHUB_STEP_SUMMARY"

@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   apk:
@@ -101,10 +101,25 @@ jobs:
           if-no-files-found: error
           retention-days: 90
 
+      # A release asset is a direct .apk link: no login on a public repo, no unzip.
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          APK=$(ls dist/*.apk | head -1)
+          TAG="qsi-offline-v1.0.${{ github.run_number }}"
+          gh release create "$TAG" "$APK" --title "QSI Offline 1.0.${{ github.run_number }}" \
+            --notes "Built by run ${{ github.run_id }}. Android 15 or newer. Install the .apk below."
+          echo "Direct link: https://github.com/$GH_REPO/releases/download/$TAG/$(basename "$APK")"
+
       - name: Summary
         run: |
           {
             echo "## QSI Offline"
+            echo
+            echo "Direct link: https://github.com/${{ github.repository }}/releases/download/qsi-offline-v1.0.${{ github.run_number }}/QSI-Offline-1.0.${{ github.run_number }}.apk"
             echo
             echo "Download **qsi-offline-apk-${{ github.run_number }}** from the Artifacts"
             echo "section of this run, unzip it, and open the APK on the phone."
