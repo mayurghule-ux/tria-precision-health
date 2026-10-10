@@ -914,6 +914,19 @@ index 2048f0d..fd6bf18 100644
        <item name="postSplashScreenTheme">@style/Theme.Gallery</item>
    </style>
    <style name="Theme.Gallery.OssLicenses" parent="Theme.AppCompat.Light.DarkActionBar">
+diff --git a/Android/src/gradle.properties b/Android/src/gradle.properties
+index effe9b8..f5cc9b6 100644
+--- a/Android/src/gradle.properties
++++ b/Android/src/gradle.properties
+@@ -30,5 +30,7 @@ android.dependency.useConstraints=true
+ android.r8.strictFullModeForKeepRules=true
+ android.r8.optimizedResourceShrinking=true
+ android.builtInKotlin=false
+-android.newDsl=true
++# QSI Offline: the pinned Kotlin plugin (2.2.10) and the kotlinOptions blocks need the
++# legacy Android DSL; AGP 9 keeps it available behind this flag.
++android.newDsl=false
+ android.packagingOptions.jniLibs.useLegacyPackaging=true
 diff --git a/Android/src/smollm/build.gradle.kts b/Android/src/smollm/build.gradle.kts
 index 406bf3c..3431de9 100644
 --- a/Android/src/smollm/build.gradle.kts
