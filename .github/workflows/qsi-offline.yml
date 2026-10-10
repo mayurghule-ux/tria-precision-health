@@ -1,0 +1,111 @@
+name: Build QSI Offline
+
+on:
+  push:
+    branches: [main, "claude/**"]
+    paths: ["qsi-offline/**", ".github/workflows/qsi-offline.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  apk:
+    name: Assemble QSI Offline
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: "21"
+          distribution: temurin
+
+      - name: Install NDK and CMake pinned by Box
+        run: |
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null || true
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" \
+            "ndk;27.2.12479018" "cmake;3.22.1" "platforms;android-36" > /dev/null
+          echo "Installed NDK 27.2.12479018 and CMake 3.22.1"
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      # Box's release build signs with the debug key. Caching that key keeps the
+      # signature stable between builds, so a newer APK installs over an older one.
+      # If the cache is evicted (7 days unused) a new key is made and the next
+      # install needs the old copy removed first.
+      - name: Restore signing key
+        uses: actions/cache@v4
+        with:
+          path: ~/.android/debug.keystore
+          key: qsi-offline-debug-keystore-v1
+
+      - name: Build
+        env:
+          QSI_VERSION_CODE: ${{ github.run_number }}
+          QSI_VERSION_NAME: 1.0.${{ github.run_number }}
+        run: qsi-offline/build.sh "$RUNNER_TEMP/box"
+
+      - name: Collect APK
+        run: |
+          mkdir -p dist
+          cp "$RUNNER_TEMP"/box/Android/src/app/build/outputs/apk/release/*.apk \
+             "dist/QSI-Offline-1.0.${{ github.run_number }}.apk"
+          ls -lh dist
+
+      # The brief: branded as QSI Offline, only the two preset models, and no
+      # model names anywhere the user can see. Checked against the built APK.
+      - name: Verify branding and presets
+        run: |
+          set -euo pipefail
+          APK=$(ls dist/*.apk)
+          AAPT2=$(ls -d "$ANDROID_HOME"/build-tools/*/aapt2 | sort -V | tail -1)
+
+          BADGING=$("$AAPT2" dump badging "$APK")
+          echo "$BADGING" | grep -E "^package:|^application-label:"
+          echo "$BADGING" | grep -q "package: name='in.quantumsi.offline'" \
+            || { echo "::error::wrong application id"; exit 1; }
+          echo "$BADGING" | grep -q "application-label:'QSI Offline'" \
+            || { echo "::error::app label is not QSI Offline"; exit 1; }
+
+          ALLOW=$(unzip -p "$APK" assets/model_allowlist.json)
+          echo "$ALLOW" | python3 -c '
+          import json, sys
+          models = json.load(sys.stdin)["models"]
+          names = [m["name"] for m in models]
+          print("allowlisted models:", names)
+          assert names == ["QSI Core"], names
+          '
+
+          # Upstream display names that must not reach the UI.
+          STRINGS=$(unzip -p "$APK" 'classes*.dex' | strings)
+          for banned in "Whisper Tiny" "Whisper Base" "Whisper Small" "Gemma-4-E2B-it" \
+                        "Box is a privacy-focused fork" "Developed by Jegly"; do
+            if echo "$STRINGS" | grep -qF "$banned"; then
+              echo "::error::found upstream name in the app: $banned"; exit 1
+            fi
+          done
+          echo "$STRINGS" | grep -qF "QSI Voice" || { echo "::error::QSI Voice missing"; exit 1; }
+          echo "Branding and presets verified."
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: qsi-offline-apk-${{ github.run_number }}
+          path: dist/*.apk
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Summary
+        run: |
+          {
+            echo "## QSI Offline"
+            echo
+            echo "Download **qsi-offline-apk-${{ github.run_number }}** from the Artifacts"
+            echo "section of this run, unzip it, and open the APK on the phone."
+            echo
+            echo "Needs Android 15 or newer. QSI Core needs about 2.6 GB free and 8 GB RAM;"
+            echo "QSI Voice about 0.6 GB. Both download once inside the app, then run offline."
+          } >> "$GITHUB_STEP_SUMMARY"

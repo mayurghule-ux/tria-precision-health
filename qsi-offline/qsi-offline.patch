@@ -1,0 +1,955 @@
+diff --git a/Android/src/app/build.gradle.kts b/Android/src/app/build.gradle.kts
+index 63b2345..8d01aa7 100644
+--- a/Android/src/app/build.gradle.kts
++++ b/Android/src/app/build.gradle.kts
+@@ -33,11 +33,14 @@ android {
+   compileSdk = 36
+ 
+   defaultConfig {
+-    applicationId = "com.box.gallery"
++    // QSI Offline: phones are arm64; skipping the other ABIs cuts build time and APK size.
++    ndk { abiFilters += listOf("arm64-v8a") }
++    // QSI Offline: its own application id, so it installs alongside Box rather than over it.
++    applicationId = "in.quantumsi.offline"
+     minSdk = 35
+     targetSdk = 37
+-    versionCode = 26
+-    versionName = "1.0.12"
++    versionCode = (System.getenv("QSI_VERSION_CODE") ?: "1").toInt()
++    versionName = System.getenv("QSI_VERSION_NAME") ?: "1.0"
+ 
+     // Needed for HuggingFace auth workflows.
+     // Use the scheme of the "Redirect URLs" in HuggingFace app.
+@@ -67,6 +70,11 @@ android {
+     compose = true
+     buildConfig = true
+   }
++  // QSI Offline: upstream lint findings should not block a release build of the fork.
++  lint {
++    checkReleaseBuilds = false
++    abortOnError = false
++  }
+ }
+ 
+ dependencies {
+diff --git a/Android/src/app/src/main/AndroidManifest.xml b/Android/src/app/src/main/AndroidManifest.xml
+index b8be89f..d363c2e 100644
+--- a/Android/src/app/src/main/AndroidManifest.xml
++++ b/Android/src/app/src/main/AndroidManifest.xml
+@@ -58,7 +58,7 @@
+         android:fullBackupContent="@xml/backup_rules"
+         android:networkSecurityConfig="@xml/network_security_config"
+         android:icon="@mipmap/ic_launcher"
+-        android:label="Box"
++        android:label="@string/app_name"
+         android:roundIcon="@mipmap/ic_launcher"
+         android:supportsRtl="true"
+         android:theme="@style/Theme.Gallery"
+diff --git a/Android/src/app/src/main/assets/model_allowlist.json b/Android/src/app/src/main/assets/model_allowlist.json
+index d186837..ee83291 100644
+--- a/Android/src/app/src/main/assets/model_allowlist.json
++++ b/Android/src/app/src/main/assets/model_allowlist.json
+@@ -1,10 +1,10 @@
+ {
+   "models": [
+     {
+-      "name": "Gemma-4-E2B-it",
++      "name": "QSI Core",
+       "modelId": "litert-community/gemma-4-E2B-it-litert-lm",
+-      "modelFile": "gemma-4-E2B-it.litertlm",
+-      "description": "A variant of Gemma 4 E2B ready for deployment on Android using [LiteRT-LM](https://github.com/google-ai-edge/LiteRT-LM/blob/main/docs/api/kotlin/getting_started.md). It supports multi-modality input, with up to 32K context length. **Gemma 4 is now available!**",
++      "modelFile": "qsi-core.litertlm",
++      "description": "The QSI Offline AI engine. Runs entirely on this phone: chat, questions about photos and audio, and on-device tools. Nothing you type, say or show it leaves the device.",
+       "sizeInBytes": 2583085056,
+       "minDeviceMemoryInGb": 8,
+       "commitHash": "7fa1d78473894f7e736a21d920c3aa80f950c0db",
+@@ -33,139 +33,8 @@
+         "llm_agent_chat",
+         "llm_ask_image",
+         "llm_ask_audio"
+-      ]
+-    },
+-    {
+-      "name": "Gemma-4-E4B-it",
+-      "modelId": "litert-community/gemma-4-E4B-it-litert-lm",
+-      "modelFile": "gemma-4-E4B-it.litertlm",
+-      "description": "A variant of Gemma 4 E4B ready for deployment on Android using [LiteRT-LM](https://github.com/google-ai-edge/LiteRT-LM/blob/main/docs/api/kotlin/getting_started.md). It supports multi-modality input, with up to 32K context length. **Gemma 4 is now available!**",
+-      "sizeInBytes": 3654467584,
+-      "minDeviceMemoryInGb": 12,
+-      "commitHash": "9695417f248178c63a9f318c6e0c56cb917cb837",
+-      "llmSupportImage": true,
+-      "llmSupportAudio": true,
+-      "llmSupportThinking": true,
+-      "defaultConfig": {
+-        "topK": 64,
+-        "topP": 0.95,
+-        "temperature": 1.0,
+-        "maxContextLength": 32000,
+-        "maxTokens": 4000,
+-        "accelerators": "gpu,npu,cpu",
+-        "visionAccelerator": "gpu"
+-      },
+-      "taskTypes": [
+-        "llm_chat",
+-        "llm_prompt_lab",
+-        "llm_agent_chat",
+-        "llm_ask_image",
+-        "llm_ask_audio"
+-      ],
+-      "bestForTaskTypes": [
+-        "llm_chat",
+-        "llm_prompt_lab",
+-        "llm_agent_chat",
+-        "llm_ask_image",
+-        "llm_ask_audio"
+-      ]
+-    },
+-    {
+-      "name": "Gemma3-1B-IT",
+-      "modelId": "litert-community/Gemma3-1B-IT",
+-      "modelFile": "gemma3-1b-it-int4.litertlm",
+-      "description": "A variant of [google/Gemma-3-1B-IT](https://huggingface.co/google/Gemma-3-1B-IT) with 4-bit quantization ready for deployment on Android using [LiteRT-LM](https://github.com/google-ai-edge/LiteRT-LM/blob/main/kotlin/README.md).",
+-      "sizeInBytes": 584417280,
+-      "minDeviceMemoryInGb": 6,
+-      "commitHash": "42d538a932e8d5b12e6b3b455f5572560bd60b2c",
+-      "defaultConfig": {
+-        "topK": 64,
+-        "topP": 0.95,
+-        "temperature": 1.0,
+-        "maxTokens": 1024,
+-        "accelerators": "gpu,npu,cpu"
+-      },
+-      "taskTypes": ["llm_chat", "llm_prompt_lab"],
+-      "bestForTaskTypes": ["llm_chat", "llm_prompt_lab"]
+-    },
+-    {
+-      "name": "Qwen2.5-1.5B-Instruct",
+-      "modelId": "litert-community/Qwen2.5-1.5B-Instruct",
+-      "modelFile": "Qwen2.5-1.5B-Instruct_multi-prefill-seq_q8_ekv4096.litertlm",
+-      "description": "A variant of [Qwen/Qwen2.5-1.5B-Instruct](https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct) ready for deployment on Android using [LiteRT-LM](https://github.com/google-ai-edge/LiteRT-LM/blob/main/kotlin/README.md).",
+-      "sizeInBytes": 1597931520,
+-      "minDeviceMemoryInGb": 4,
+-      "commitHash": "19edb84c69a0212f29a6ef17ba0d6f278b6a1614",
+-      "defaultConfig": {
+-        "topK": 20,
+-        "topP": 0.8,
+-        "temperature": 0.7,
+-        "maxTokens": 4096,
+-        "accelerators": "gpu,npu,cpu"
+-      },
+-      "taskTypes": ["llm_chat", "llm_prompt_lab"]
+-    },
+-    {
+-      "name": "DeepSeek-R1-Distill-Qwen-1.5B",
+-      "modelId": "litert-community/DeepSeek-R1-Distill-Qwen-1.5B",
+-      "modelFile": "DeepSeek-R1-Distill-Qwen-1.5B_multi-prefill-seq_q8_ekv4096.litertlm",
+-      "description": "A variant of [deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B](https://huggingface.co/deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B) ready for deployment on Android using [LiteRT-LM](https://github.com/google-ai-edge/LiteRT-LM/blob/main/kotlin/README.md).",
+-      "sizeInBytes": 1833451520,
+-      "minDeviceMemoryInGb": 4,
+-      "commitHash": "e34bb88632342d1f9640bad579a45134eb1cf988",
+-      "defaultConfig": {
+-        "topK": 64,
+-        "topP": 0.95,
+-        "temperature": 1.0,
+-        "maxTokens": 4096,
+-        "accelerators": "gpu,npu,cpu"
+-      },
+-      "taskTypes": ["llm_chat", "llm_prompt_lab"]
+-    },
+-    {
+-      "name": "TinyGarden-270M",
+-      "modelId": "litert-community/functiongemma-270m-ft-tiny-garden",
+-      "modelFile": "tiny_garden_q8_ekv1024.litertlm",
+-      "description": "Fine-tuned Function Gemma 270M model for Tiny Garden.",
+-      "sizeInBytes": 288964608,
+-      "minDeviceMemoryInGb": 4,
+-      "commitHash": "c205853ff82da86141a1105faa2344a8b176dfe7",
+-      "defaultConfig": {
+-        "topK": 64,
+-        "topP": 0.95,
+-        "temperature": 0.0,
+-        "maxTokens": 1024,
+-        "accelerators": "cpu"
+-      },
+-      "taskTypes": [
+-        "llm_tiny_garden"
+-      ],
+-      "bestForTaskTypes": [
+-        "llm_tiny_garden"
+-      ]
+-    },
+-    {
+-      "name": "MobileActions-270M",
+-      "modelId": "jegly/mobile_actions_q8_ekv1024.litertlm",
+-      "modelFile": "mobile_actions_q8_ekv1024.litertlm",
+-      "url": "https://huggingface.co/jegly/mobile_actions_q8_ekv1024.litertlm/resolve/main/mobile_actions_q8_ekv1024.litertlm?download=true",
+-      "description": "Fine-tuned Function Gemma 270M model for Mobile Actions.",
+-      "sizeInBytes": 288964608,
+-      "minDeviceMemoryInGb": 4,
+-      "commitHash": "491f610",
+-      "defaultConfig": {
+-        "topK": 64,
+-        "topP": 0.95,
+-        "temperature": 0.0,
+-        "maxTokens": 1024,
+-        "accelerators": "cpu"
+-      },
+-      "taskTypes": [
+-        "llm_mobile_actions"
+       ],
+-      "bestForTaskTypes": [
+-        "llm_mobile_actions"
+-      ]
++      "url": "https://huggingface.co/litert-community/gemma-4-E2B-it-litert-lm/resolve/7fa1d78473894f7e736a21d920c3aa80f950c0db/gemma-4-E2B-it.litertlm?download=true"
+     }
+   ]
+ }
+diff --git a/Android/src/app/src/main/assets/skills/calculate-hash/SKILL.md b/Android/src/app/src/main/assets/skills/calculate-hash/SKILL.md
+index 678892b..c9ed5f6 100644
+--- a/Android/src/app/src/main/assets/skills/calculate-hash/SKILL.md
++++ b/Android/src/app/src/main/assets/skills/calculate-hash/SKILL.md
+@@ -25,4 +25,4 @@ Call the `run_js` tool with:
+ - "What is the SHA-256 hash of 'hello world'?"
+ - "Calculate the SHA-512 of this string: ..."
+ - "Hash 'password123' with SHA-1"
+-- "What is the hash of 'gemma'?" → use SHA-256 by default
++- "What is the hash of 'hello'?" → use SHA-256 by default
+diff --git a/Android/src/app/src/main/java/com/box/gallery/MainActivity.kt b/Android/src/app/src/main/java/com/box/gallery/MainActivity.kt
+index 2678b8a..37ba48e 100644
+--- a/Android/src/app/src/main/java/com/box/gallery/MainActivity.kt
++++ b/Android/src/app/src/main/java/com/box/gallery/MainActivity.kt
+@@ -272,7 +272,7 @@ private fun DbLockedScreen(activity: FragmentActivity) {
+         tint = MaterialTheme.colorScheme.primary,
+       )
+       Spacer(modifier = Modifier.height(4.dp))
+-      Text("Box", style = MaterialTheme.typography.headlineMedium)
++      Text("QSI Offline", style = MaterialTheme.typography.headlineMedium)
+       Text(
+         "Authenticate to decrypt your chats",
+         style = MaterialTheme.typography.bodyMedium,
+diff --git a/Android/src/app/src/main/java/com/google/ai/edge/gallery/customtasks/agentchat/AgentChatTaskModule.kt b/Android/src/app/src/main/java/com/google/ai/edge/gallery/customtasks/agentchat/AgentChatTaskModule.kt
+index ee8b9b3..d1f2c49 100644
+--- a/Android/src/app/src/main/java/com/google/ai/edge/gallery/customtasks/agentchat/AgentChatTaskModule.kt
++++ b/Android/src/app/src/main/java/com/google/ai/edge/gallery/customtasks/agentchat/AgentChatTaskModule.kt
+@@ -48,7 +48,7 @@ class AgentChatTask @Inject constructor() : CustomTask {
+       models = mutableListOf(),
+       description = "Chat with on-device large language models with skills and tools",
+       shortDescription = "Complete agentic tasks with chat",
+-      docUrl = "https://github.com/google-ai-edge/LiteRT-LM/blob/main/kotlin/README.md",
++      docUrl = "",
+       sourceCodeUrl =
+         "https://github.com/google-ai-edge/gallery/blob/main/Android/src/app/src/main/java/com/google/ai/edge/gallery/customtasks/agentchat/",
+       textInputPlaceHolderRes = R.string.text_input_placeholder_llm_chat,
+diff --git a/Android/src/app/src/main/java/com/google/ai/edge/gallery/data/DownloadRepository.kt b/Android/src/app/src/main/java/com/google/ai/edge/gallery/data/DownloadRepository.kt
+index 76a676e..fafb926 100644
+--- a/Android/src/app/src/main/java/com/google/ai/edge/gallery/data/DownloadRepository.kt
++++ b/Android/src/app/src/main/java/com/google/ai/edge/gallery/data/DownloadRepository.kt
+@@ -278,7 +278,7 @@ class DefaultDownloadRepository(
+     }
+ 
+     val channelId = "download_notification"
+-    val channelName = "AI Edge Gallery download notification"
++    val channelName = "QSI Offline downloads"
+ 
+     // Create the NotificationChannel, but only on API 26+ because
+     // the NotificationChannel class is new and not in the support library
+diff --git a/Android/src/app/src/main/java/com/google/ai/edge/gallery/data/ModelAllowlist.kt b/Android/src/app/src/main/java/com/google/ai/edge/gallery/data/ModelAllowlist.kt
+index 8e2da78..3d96d9b 100644
+--- a/Android/src/app/src/main/java/com/google/ai/edge/gallery/data/ModelAllowlist.kt
++++ b/Android/src/app/src/main/java/com/google/ai/edge/gallery/data/ModelAllowlist.kt
+@@ -176,7 +176,8 @@ data class AllowedModel(
+           .toMutableList()
+     }
+ 
+-    var learnMoreUrl = "https://huggingface.co/${modelId}"
++    // QSI Offline: no upstream model page is linked from the app.
++    var learnMoreUrl = ""
+ 
+     if (runtimeType == RuntimeType.AICORE) {
+       downloadUrl = ""
+diff --git a/Android/src/app/src/main/java/com/google/ai/edge/gallery/security/BiometricEncryptionManager.kt b/Android/src/app/src/main/java/com/google/ai/edge/gallery/security/BiometricEncryptionManager.kt
+index 74ecf58..a4a6292 100644
+--- a/Android/src/app/src/main/java/com/google/ai/edge/gallery/security/BiometricEncryptionManager.kt
++++ b/Android/src/app/src/main/java/com/google/ai/edge/gallery/security/BiometricEncryptionManager.kt
+@@ -164,7 +164,7 @@ object BiometricEncryptionManager {
+             }
+         }
+         val promptInfo = BiometricPrompt.PromptInfo.Builder()
+-            .setTitle("Box")
++            .setTitle("QSI Offline")
+             .setSubtitle(subtitle)
+             .setNegativeButtonText("Cancel")
+             .setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG)
+diff --git a/Android/src/app/src/main/java/com/google/ai/edge/gallery/security/BiometricHelper.kt b/Android/src/app/src/main/java/com/google/ai/edge/gallery/security/BiometricHelper.kt
+index dc65308..85ff1ee 100644
+--- a/Android/src/app/src/main/java/com/google/ai/edge/gallery/security/BiometricHelper.kt
++++ b/Android/src/app/src/main/java/com/google/ai/edge/gallery/security/BiometricHelper.kt
+@@ -111,7 +111,7 @@ class BiometricHelper(private val activity: FragmentActivity) {
+         }
+ 
+         val promptInfo = BiometricPrompt.PromptInfo.Builder()
+-            .setTitle("Box")
++            .setTitle("QSI Offline")
+             .setSubtitle("Authenticate to access your chats")
+             .setNegativeButtonText("Cancel")
+             .setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG)
+@@ -160,7 +160,7 @@ class BiometricHelper(private val activity: FragmentActivity) {
+         }
+ 
+         val promptInfo = BiometricPrompt.PromptInfo.Builder()
+-            .setTitle("Box")
++            .setTitle("QSI Offline")
+             .setSubtitle("Authenticate to access your chats")
+             .setNegativeButtonText("Cancel")
+             .setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG)
+diff --git a/Android/src/app/src/main/java/com/google/ai/edge/gallery/security/OfflineMode.kt b/Android/src/app/src/main/java/com/google/ai/edge/gallery/security/OfflineMode.kt
+index e144c35..d7c3a1a 100644
+--- a/Android/src/app/src/main/java/com/google/ai/edge/gallery/security/OfflineMode.kt
++++ b/Android/src/app/src/main/java/com/google/ai/edge/gallery/security/OfflineMode.kt
+@@ -39,7 +39,7 @@ object OfflineMode {
+      */
+     fun assertOnlineOrThrow() {
+         if (_isEnabled.value) {
+-            throw OfflineModeException("Network request blocked: Box is in offline-only mode")
++            throw OfflineModeException("Network request blocked: QSI Offline is in offline-only mode")
+         }
+     }
+ 
+diff --git a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/home/ChatHistoryViewModel.kt b/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/home/ChatHistoryViewModel.kt
+index e210cca..82eda91 100644
+--- a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/home/ChatHistoryViewModel.kt
++++ b/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/home/ChatHistoryViewModel.kt
+@@ -73,7 +73,7 @@ class ChatHistoryViewModel @Inject constructor(
+                 val fmt = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
+                 val conversations = chatRepository.getAllConversationsSync()
+                 val sb = StringBuilder()
+-                sb.appendLine("Box Chat Export")
++                sb.appendLine("QSI Offline Chat Export")
+                 sb.appendLine("Exported: ${fmt.format(Date())}")
+                 sb.appendLine("Total conversations: ${conversations.size}")
+                 sb.appendLine("=".repeat(72))
+@@ -110,7 +110,7 @@ class ChatHistoryViewModel @Inject constructor(
+             try {
+                 val fmt = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
+                 val sb = StringBuilder()
+-                sb.appendLine("Box Chat Export")
++                sb.appendLine("QSI Offline Chat Export")
+                 sb.appendLine("Conversation: ${conversation.title}")
+                 if (conversation.modelName.isNotEmpty()) sb.appendLine("Model: ${conversation.modelName}")
+                 sb.appendLine("Exported: ${fmt.format(Date())}")
+diff --git a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/home/HomeScreen.kt b/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/home/HomeScreen.kt
+index e2d37bd..9058d24 100644
+--- a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/home/HomeScreen.kt
++++ b/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/home/HomeScreen.kt
+@@ -493,26 +493,7 @@ fun HomeScreen(
+                     Spacer(modifier = Modifier.width(4.dp))
+                     Text("History", maxLines = 1)
+                   }
+-                  FilledTonalButton(
+-                    onClick = onImportModelClicked,
+-                    modifier = Modifier.weight(1f).fillMaxHeight(),
+-                    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
+-                  ) {
+-                    Icon(
+-                      Icons.Rounded.FolderOpen,
+-                      contentDescription = null,
+-                      modifier = Modifier.size(16.dp),
+-                    )
+-                    Spacer(modifier = Modifier.width(4.dp))
+-                    Column {
+-                      Text("Import", maxLines = 1)
+-                      Text(
+-                        "GGUF · LiteRT",
+-                        style = MaterialTheme.typography.labelSmall,
+-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+-                      )
+-                    }
+-                  }
++                  // QSI Offline: models are preset, so the import button is removed.
+                 }
+ 
+                 // Tab header for categories.
+@@ -702,7 +683,7 @@ private fun IntroText(enableAnimation: Boolean, gm4: Boolean) {
+     }
+ 
+   val introText = buildAnnotatedString {
+-    // Box app - removed promotional text
++    append("Private AI that runs entirely on this phone. No account, no cloud.")
+   }
+   Text(
+     introText,
+diff --git a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/home/SettingsDialog.kt b/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/home/SettingsDialog.kt
+index b1ba64d..634c2b6 100644
+--- a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/home/SettingsDialog.kt
++++ b/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/home/SettingsDialog.kt
+@@ -203,7 +203,7 @@ fun SettingsDialog(
+             verticalArrangement = Arrangement.spacedBy(4.dp),
+           ) {
+             Text(
+-              "HuggingFace access token",
++              "Download access token (advanced)",
+               style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Medium),
+             )
+             // Show the start of the token.
+@@ -410,10 +410,10 @@ fun SettingsDialog(
+               style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Medium),
+             )
+             Text(
+-              "Box is a privacy-focused fork of Google AI Edge Gallery. " +
+-                "Chat history is encrypted with SQLCipher. " +
+-                "Biometric authentication protects app access. " +
+-                "Not affiliated with Google.",
++              "Everything runs on this phone. " +
++                "Chat history is stored encrypted. " +
++                "Biometric lock protects app access. " +
++                "Nothing you type, say or show is sent anywhere.",
+               style = MaterialTheme.typography.bodySmall,
+               color = MaterialTheme.colorScheme.onSurfaceVariant,
+             )
+@@ -447,24 +447,22 @@ fun SettingsDialog(
+               style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Medium),
+             )
+             Text(
+-              "Developed by Jegly",
+-              style = MaterialTheme.typography.bodySmall,
+-              color = MaterialTheme.colorScheme.onSurfaceVariant,
+-            )
+-            Text(
+-              "Box fork version: v1.0.1",
++              "QSI Offline by Quantum SI",
+               style = MaterialTheme.typography.bodySmall,
+               color = MaterialTheme.colorScheme.onSurfaceVariant,
+             )
+             ClickableLink(
+-              url = "https://github.com/jegly",
+-              linkText = "github.com/jegly",
++              url = "https://www.quantumsi.in",
++              linkText = "www.quantumsi.in",
+               modifier = Modifier.padding(top = 2.dp),
+             )
+-            ClickableLink(
+-              url = "https://www.jegly.xyz",
+-              linkText = "www.jegly.xyz",
+-              modifier = Modifier.padding(top = 2.dp),
++            // Attribution required by the Apache License 2.0 for the redistributed app code.
++            Text(
++              "Built on open-source software: Box by Jegly and Google AI Edge Gallery, " +
++                "both under the Apache License 2.0. Not affiliated with or endorsed by either.",
++              style = MaterialTheme.typography.bodySmall,
++              color = MaterialTheme.colorScheme.onSurfaceVariant,
++              modifier = Modifier.padding(top = 6.dp),
+             )
+           }
+ 
+@@ -475,16 +473,13 @@ fun SettingsDialog(
+               style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Medium),
+             )
+             // Removed "View App Terms of Service" button
++            // QSI Offline's preset AI models and its app code are all under permissive
++            // open-source licences; the full texts are under "View licenses" above.
+             ClickableLink(
+-              url = "https://ai.google.dev/gemma/terms",
+-              linkText = stringResource(R.string.tos_dialog_title_gemma),
++              url = "https://www.apache.org/licenses/LICENSE-2.0",
++              linkText = "Apache License 2.0",
+               modifier = Modifier.padding(top = 4.dp),
+             )
+-            ClickableLink(
+-              url = "https://ai.google.dev/gemma/prohibited_use_policy",
+-              linkText = stringResource(R.string.settings_dialog_gemma_prohibited_use_policy),
+-              modifier = Modifier.padding(top = 8.dp),
+-            )
+           }
+         }
+ 
+diff --git a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/llmchat/LlmChatTaskModule.kt b/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/llmchat/LlmChatTaskModule.kt
+index e954b3a..d4dbf38 100644
+--- a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/llmchat/LlmChatTaskModule.kt
++++ b/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/llmchat/LlmChatTaskModule.kt
+@@ -65,7 +65,7 @@ class LlmChatTask @Inject constructor() : CustomTask {
+       models = mutableListOf(),
+       description = "Chat with on-device large language models",
+       shortDescription = "Chat with an on-device LLM",
+-      docUrl = "https://github.com/google-ai-edge/LiteRT-LM/blob/main/kotlin/README.md",
++      docUrl = "",
+       sourceCodeUrl =
+         "https://github.com/google-ai-edge/gallery/blob/main/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/llmchat/LlmChatModelHelper.kt",
+       textInputPlaceHolderRes = R.string.text_input_placeholder_llm_chat,
+@@ -152,7 +152,7 @@ class LlmAskImageTask @Inject constructor() : CustomTask {
+       models = mutableListOf(),
+       description = "Ask questions about images with on-device large language models",
+       shortDescription = "Ask questions about images",
+-      docUrl = "https://github.com/google-ai-edge/LiteRT-LM/blob/main/kotlin/README.md",
++      docUrl = "",
+       sourceCodeUrl =
+         "https://github.com/google-ai-edge/gallery/blob/main/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/llmchat/LlmChatModelHelper.kt",
+       textInputPlaceHolderRes = R.string.text_input_placeholder_llm_chat,
+@@ -217,7 +217,7 @@ class LlmAskAudioTask @Inject constructor() : CustomTask {
+       description =
+         "Instantly transcribe and/or translate audio clips using on-device large language models",
+       shortDescription = "Transcribe and translate audio",
+-      docUrl = "https://github.com/google-ai-edge/LiteRT-LM/blob/main/kotlin/README.md",
++      docUrl = "",
+       sourceCodeUrl =
+         "https://github.com/google-ai-edge/gallery/blob/main/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/llmchat/LlmChatModelHelper.kt",
+       textInputPlaceHolderRes = R.string.text_input_placeholder_llm_chat,
+diff --git a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/llmsingleturn/LlmSingleTurnTaskModule.kt b/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/llmsingleturn/LlmSingleTurnTaskModule.kt
+index dab3ea7..a90597d 100644
+--- a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/llmsingleturn/LlmSingleTurnTaskModule.kt
++++ b/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/llmsingleturn/LlmSingleTurnTaskModule.kt
+@@ -46,7 +46,7 @@ class LlmSingleTurnTask @Inject constructor() : CustomTask {
+       models = mutableListOf(),
+       description = "Single turn use cases with on-device large language models",
+       shortDescription = "Single turn use cases",
+-      docUrl = "https://github.com/google-ai-edge/LiteRT-LM/blob/main/kotlin/README.md",
++      docUrl = "",
+       sourceCodeUrl =
+         "https://github.com/google-ai-edge/gallery/blob/main/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/llmchat/LlmChatModelHelper.kt",
+       textInputPlaceHolderRes = R.string.text_input_placeholder_llm_chat,
+diff --git a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/modelmanager/GlobalModelManager.kt b/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/modelmanager/GlobalModelManager.kt
+index 1e45e29..e79639d 100644
+--- a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/modelmanager/GlobalModelManager.kt
++++ b/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/modelmanager/GlobalModelManager.kt
+@@ -135,9 +135,7 @@ fun GlobalModelManager(
+     showPromo = !viewModel.dataStoreRepository.hasViewedPromo(promoId = promoId)
+   }
+ 
+-  LaunchedEffect(startImport) {
+-    if (startImport) showImportModelSheet = true
+-  }
++  // QSI Offline: importing models is disabled; startImport is ignored.
+ 
+   val filePickerLauncher: ActivityResultLauncher<Intent> =
+     rememberLauncherForActivityResult(
+@@ -236,18 +234,7 @@ fun GlobalModelManager(
+         modifier = modifier,
+       )
+     },
+-    floatingActionButton = {
+-      // A floating action button to show "import model" bottom sheet.
+-      val cdImportModelFab = stringResource(R.string.cd_import_model_button)
+-      SmallFloatingActionButton(
+-        onClick = { showImportModelSheet = true },
+-        containerColor = MaterialTheme.colorScheme.secondaryContainer,
+-        contentColor = MaterialTheme.colorScheme.secondary,
+-        modifier = Modifier.semantics { contentDescription = cdImportModelFab },
+-      ) {
+-        Icon(Icons.Filled.Add, contentDescription = null)
+-      }
+-    },
++    // QSI Offline: models are preset, so there is no import button.
+   ) { innerPadding ->
+     Box() {
+       LazyColumn(
+diff --git a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/modelmanager/ModelManagerViewModel.kt b/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/modelmanager/ModelManagerViewModel.kt
+index 07b6303..ef828a4 100644
+--- a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/modelmanager/ModelManagerViewModel.kt
++++ b/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/modelmanager/ModelManagerViewModel.kt
+@@ -78,6 +78,21 @@ import net.openid.appauth.ResponseTypeValues
+ 
+ private const val TAG = "AGModelManagerViewModel"
+ private const val TEXT_INPUT_HISTORY_MAX_SIZE = 50
++/**
++ * QSI Offline ships only the features its two preset models power. Everything else Box
++ * registers (image generation, the demo games, the example task) needs other models, whose
++ * names would surface in the UI.
++ */
++private val QSI_ENABLED_TASK_IDS =
++  setOf(
++    BuiltInTaskId.LLM_CHAT,
++    BuiltInTaskId.LLM_PROMPT_LAB,
++    BuiltInTaskId.LLM_ASK_IMAGE,
++    BuiltInTaskId.LLM_ASK_AUDIO,
++    BuiltInTaskId.LLM_AGENT_CHAT,
++    BuiltInTaskId.WHISPER,
++  )
++
+ private const val MODEL_ALLOWLIST_FILENAME = "model_allowlist.json"
+ private const val MODEL_ALLOWLIST_TEST_FILENAME = "model_allowlist_test.json"
+ private const val ALLOWLIST_BASE_URL =
+@@ -219,7 +234,7 @@ constructor(
+   }
+ 
+   fun getActiveCustomTasks(): List<CustomTask> {
+-    return customTasks.toList()
++    return customTasks.filter { it.task.id in QSI_ENABLED_TASK_IDS }
+   }
+ 
+   fun getSelectedModel(): Model? {
+diff --git a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/theme/Color.kt b/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/theme/Color.kt
+index 2f99969..d69c74f 100644
+--- a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/theme/Color.kt
++++ b/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/theme/Color.kt
+@@ -18,10 +18,10 @@ package com.google.ai.edge.gallery.ui.theme
+ 
+ import androidx.compose.ui.graphics.Color
+ 
+-val primaryLight = Color(0xFF0B57D0)
++val primaryLight = Color(0xFF4F46E5) // QSI accent
+ val onPrimaryLight = Color(0xFFFFFFFF)
+-val primaryContainerLight = Color(0xFFD3E3FD)
+-val onPrimaryContainerLight = Color(0xFF0842A0)
++val primaryContainerLight = Color(0xFFE0E7FF)
++val onPrimaryContainerLight = Color(0xFF312E81)
+ val secondaryLight = Color(0xFF00639B)
+ val onSecondaryLight = Color(0xFFFFFFFF)
+ val secondaryContainerLight = Color(0xFFC2E7FF)
+@@ -49,15 +49,15 @@ val inverseSurfaceLight = Color(0xFF303030)
+ val inverseOnSurfaceLight = Color(0xFFF2F2F2)
+ val outlineLight = Color(0xFF747775)
+ val outlineVariantLight = Color(0xFFC4C7C5)
+-val inversePrimaryLight = Color(0xFFA8C7FA)
++val inversePrimaryLight = Color(0xFFA5B4FC)
+ val surfaceDimLight = Color(0xFFD3DBE5)
+ val surfaceBrightLight = Color(0xFFFFFFFF)
+ val scrimLight = Color(0xFF000000)
+ 
+-val primaryDark = Color(0xFFA8C7FA)
+-val onPrimaryDark = Color(0xFF062E6F)
+-val primaryContainerDark = Color(0xFF0842A0)
+-val onPrimaryContainerDark = Color(0xFFD3E3FD)
++val primaryDark = Color(0xFFA5B4FC) // QSI accent
++val onPrimaryDark = Color(0xFF1E1B4B)
++val primaryContainerDark = Color(0xFF3730A3)
++val onPrimaryContainerDark = Color(0xFFE0E7FF)
+ val secondaryDark = Color(0xFF7FCFFF)
+ val onSecondaryDark = Color(0xFF003355)
+ val secondaryContainerDark = Color(0xFF004A77)
+@@ -85,7 +85,7 @@ val inverseSurfaceDark = Color(0xFFE3E3E3)
+ val inverseOnSurfaceDark = Color(0xFF303030)
+ val outlineDark = Color(0xFF8E918F)
+ val outlineVariantDark = Color(0xFF444746)
+-val inversePrimaryDark = Color(0xFF0B57D0)
++val inversePrimaryDark = Color(0xFF4F46E5)
+ val surfaceDimDark = Color(0xFF131314)
+ val surfaceBrightDark = Color(0xFF37393B)
+ val scrimDark = Color(0xFF000000)
+diff --git a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/theme/Theme.kt b/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/theme/Theme.kt
+index cfdbaca..9ca56f7 100644
+--- a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/theme/Theme.kt
++++ b/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/theme/Theme.kt
+@@ -146,7 +146,7 @@ val LocalCustomColors = staticCompositionLocalOf { CustomColors() }
+ 
+ val lightCustomColors =
+   CustomColors(
+-    appTitleGradientColors = listOf(Color(0xFF85B1F8), Color(0xFF3174F1)),
++    appTitleGradientColors = listOf(Color(0xFFA5B4FC), Color(0xFF4F46E5)),
+     tabHeaderBgColor = Color(0xFF3174F1),
+     taskCardBgColor = surfaceContainerLowestLight,
+     taskBgColors =
+@@ -224,7 +224,7 @@ val lightCustomColors =
+ 
+ val darkCustomColors =
+   CustomColors(
+-    appTitleGradientColors = listOf(Color(0xFF85B1F8), Color(0xFF3174F1)),
++    appTitleGradientColors = listOf(Color(0xFFA5B4FC), Color(0xFF4F46E5)),
+     tabHeaderBgColor = Color(0xFF3174F1),
+     taskCardBgColor = surfaceContainerHighDark,
+     taskBgColors =
+diff --git a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/whisper/WhisperScreen.kt b/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/whisper/WhisperScreen.kt
+index 49fffaf..a4f732b 100644
+--- a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/whisper/WhisperScreen.kt
++++ b/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/whisper/WhisperScreen.kt
+@@ -83,7 +83,7 @@ fun WhisperScreen(
+         if (!modelReady) {
+             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                 Text(
+-                    "Download and initialize a Whisper model to get started",
++                    "Download QSI Voice to get started",
+                     style = MaterialTheme.typography.bodyMedium,
+                     color = MaterialTheme.colorScheme.onSurfaceVariant,
+                     textAlign = TextAlign.Center,
+diff --git a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/whisper/WhisperTaskModule.kt b/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/whisper/WhisperTaskModule.kt
+index 0f0078b..cb60910 100644
+--- a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/whisper/WhisperTaskModule.kt
++++ b/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/whisper/WhisperTaskModule.kt
+@@ -32,7 +32,7 @@ private fun whisperModel(
+     info = description,
+     url = "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/$modelFile?download=true",
+     sizeInBytes = sizeInBytes,
+-    downloadFileName = modelFile,
++    downloadFileName = "qsi-voice.bin",
+     version = "main",
+     showBenchmarkButton = false,
+     showRunAgainButton = false,
+@@ -44,38 +44,17 @@ class WhisperTask @Inject constructor() : CustomTask {
+         label = "Voice Input",
+         category = Category.VOICE,
+         icon = Icons.Outlined.Mic,
+-        description = "On-device speech-to-text using Whisper. Fully offline — audio never leaves your device.",
++        description = "Speech to text that runs entirely on this phone. Audio never leaves your device.",
+         shortDescription = "On-device speech transcription",
+         models = mutableListOf(
++            // QSI Offline preset: the newest upstream speech model (large-v3-turbo,
++            // 5-bit quantised). The upstream file name is kept only in the download URL;
++            // the app shows "QSI Voice" and stores it locally under a neutral name.
+             whisperModel(
+-                name = "Whisper Tiny (English)",
+-                modelFile = "ggml-tiny.en.bin",
+-                description = "Fastest, English only (~75 MB). Best for quick transcription.",
+-                sizeInBytes = 75_000_000L,
+-            ),
+-            whisperModel(
+-                name = "Whisper Tiny",
+-                modelFile = "ggml-tiny.bin",
+-                description = "Fast, multilingual (~75 MB).",
+-                sizeInBytes = 75_000_000L,
+-            ),
+-            whisperModel(
+-                name = "Whisper Base (English)",
+-                modelFile = "ggml-base.en.bin",
+-                description = "Better accuracy, English only (~142 MB).",
+-                sizeInBytes = 142_000_000L,
+-            ),
+-            whisperModel(
+-                name = "Whisper Base",
+-                modelFile = "ggml-base.bin",
+-                description = "Better accuracy, multilingual (~142 MB).",
+-                sizeInBytes = 142_000_000L,
+-            ),
+-            whisperModel(
+-                name = "Whisper Small (English)",
+-                modelFile = "ggml-small.en.bin",
+-                description = "High accuracy, English only (~466 MB).",
+-                sizeInBytes = 466_000_000L,
++                name = "QSI Voice",
++                modelFile = "ggml-large-v3-turbo-q5_0.bin",
++                description = "Multilingual speech recognition, fully offline.",
++                sizeInBytes = 574_041_195L,
+             ),
+         ),
+     )
+@@ -94,7 +73,7 @@ class WhisperTask @Inject constructor() : CustomTask {
+                 model.instance = engine
+                 onDone("")
+             } else {
+-                onDone("Failed to load Whisper model from $modelPath")
++                onDone("Failed to load QSI Voice from $modelPath")
+             }
+         }
+     }
+diff --git a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/whisper/WhisperViewModel.kt b/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/whisper/WhisperViewModel.kt
+index 2b6df02..73b1521 100644
+--- a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/whisper/WhisperViewModel.kt
++++ b/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/whisper/WhisperViewModel.kt
+@@ -99,7 +99,8 @@ class WhisperViewModel @Inject constructor() : ViewModel() {
+                 return@launch
+             }
+ 
+-            val result = engine.transcribe(samples)
++            // QSI Offline: detect the spoken language instead of assuming English.
++            val result = engine.transcribe(samples, language = "auto")
+             _uiState.value = _uiState.value.copy(
+                 isTranscribing = false,
+                 transcript = result.ifEmpty { _uiState.value.transcript },
+diff --git a/Android/src/app/src/main/res/drawable/ic_app_icon_background.xml b/Android/src/app/src/main/res/drawable/ic_app_icon_background.xml
+index dd7e7f1..279097d 100644
+--- a/Android/src/app/src/main/res/drawable/ic_app_icon_background.xml
++++ b/Android/src/app/src/main/res/drawable/ic_app_icon_background.xml
+@@ -1,10 +1,11 @@
+ <?xml version="1.0" encoding="utf-8"?>
++<!-- QSI Offline launcher background. Placeholder brand colour; swap for the QSI palette. -->
+ <vector xmlns:android="http://schemas.android.com/apk/res/android"
+     android:width="108dp"
+     android:height="108dp"
+     android:viewportWidth="108"
+     android:viewportHeight="108">
+     <path
+-        android:fillColor="#000000"
++        android:fillColor="#1E1B4B"
+         android:pathData="M0,0h108v108h-108z" />
+ </vector>
+diff --git a/Android/src/app/src/main/res/drawable/ic_app_icon_foreground.xml b/Android/src/app/src/main/res/drawable/ic_app_icon_foreground.xml
+index d9e5203..2444c4d 100644
+--- a/Android/src/app/src/main/res/drawable/ic_app_icon_foreground.xml
++++ b/Android/src/app/src/main/res/drawable/ic_app_icon_foreground.xml
+@@ -1,60 +1,22 @@
++<?xml version="1.0" encoding="utf-8"?>
++<!-- QSI Offline mark: a "Q" ring with an orbiting point, inside the adaptive-icon safe zone. -->
+ <vector xmlns:android="http://schemas.android.com/apk/res/android"
+     android:width="108dp"
+     android:height="108dp"
+     android:viewportWidth="108"
+     android:viewportHeight="108">
+-    <!-- 3D Isometric Box with monochrome design and depth -->
+-    
+-    <!-- Top face (lightest) -->
+     <path
+-        android:fillColor="#E0E0E0"
+-        android:pathData="M54,25 L78,40 L54,55 L30,40 Z" />
+-    
+-    <!-- Left face (medium) -->
++        android:strokeColor="#A5B4FC"
++        android:strokeWidth="8.5"
++        android:fillColor="#00000000"
++        android:pathData="M30,52a22,22 0,1 0,44 0a22,22 0,1 0,-44 0" />
+     <path
+-        android:fillColor="#B0B0B0"
+-        android:pathData="M30,40 L30,70 L54,85 L54,55 Z" />
+-    
+-    <!-- Right face (dark) -->
+-    <path
+-        android:fillColor="#808080"
+-        android:pathData="M54,55 L54,85 L78,70 L78,40 Z" />
+-    
+-    <!-- Top face depth lines for 3D effect -->
+-    <path
+-        android:fillColor="#F0F0F0"
+-        android:pathData="M54,30 L73,42 L54,54 L35,42 Z" />
+-    
+-    <!-- Left face depth lines -->
+-    <path
+-        android:fillColor="#909090"
+-        android:pathData="M35,45 L35,65 L54,77 L54,57 Z" />
+-    
+-    <!-- Right face depth lines -->
+-    <path
+-        android:fillColor="#606060"
+-        android:pathData="M54,57 L54,77 L73,65 L73,45 Z" />
+-    
+-    <!-- Highlight edges for extra depth -->
++        android:strokeColor="#FFFFFF"
++        android:strokeWidth="8.5"
++        android:strokeLineCap="round"
++        android:fillColor="#00000000"
++        android:pathData="M63,63L75,75" />
+     <path
+         android:fillColor="#FFFFFF"
+-        android:pathData="M54,25 L54,30 L35,42 L30,40 Z" />
+-    
+-    <path
+-        android:fillColor="#FFFFFF"
+-        android:pathData="M54,25 L54,30 L73,42 L78,40 Z" />
+-    
+-    <!-- Shadow edges -->
+-    <path
+-        android:fillColor="#404040"
+-        android:pathData="M30,70 L35,65 L35,45 L30,40 Z" />
+-    
+-    <path
+-        android:fillColor="#404040"
+-        android:pathData="M78,40 L73,45 L73,65 L78,70 Z" />
+-    
+-    <!-- Bottom shadow -->
+-    <path
+-        android:fillColor="#303030"
+-        android:pathData="M35,65 L54,77 L73,65 L54,53 Z" />
++        android:pathData="M68,33a5,5 0,1 0,10 0a5,5 0,1 0,-10 0" />
+ </vector>
+diff --git a/Android/src/app/src/main/res/values-night/themes.xml b/Android/src/app/src/main/res/values-night/themes.xml
+index 69b30fb..bb0a8a4 100644
+--- a/Android/src/app/src/main/res/values-night/themes.xml
++++ b/Android/src/app/src/main/res/values-night/themes.xml
+@@ -19,7 +19,8 @@
+   <style name="Theme.Gallery.SplashScreen" parent="Theme.SplashScreen">
+     <!-- Need to match surfaceDark in Colors.kt -->
+     <item name="windowSplashScreenBackground">#FF131314</item>
+-    <item name="windowSplashScreenAnimatedIcon">@drawable/splash_screen_animated_icon</item>
++    <item name="windowSplashScreenAnimatedIcon">@drawable/ic_app_icon_foreground</item>
++    <item name="windowSplashScreenIconBackgroundColor">#1E1B4B</item>
+     <item name="postSplashScreenTheme">@style/Theme.Gallery</item>
+   </style>
+   <style name="Theme.Gallery.OssLicenses" parent="Theme.AppCompat">
+diff --git a/Android/src/app/src/main/res/values/strings.xml b/Android/src/app/src/main/res/values/strings.xml
+index dd16e90..512d83e 100644
+--- a/Android/src/app/src/main/res/values/strings.xml
++++ b/Android/src/app/src/main/res/values/strings.xml
+@@ -26,15 +26,15 @@
+   <string name="aichat_initializing_title" translatable="false">Initializing model</string>
+   <string name="aichat_initializing_content" translatable="false">Sit tight, this can take up to 1 minute</string>
+   <string name="app_intro" translatable="false">Explore a world of amazing on-device models from</string>
+-  <string name="app_name" translatable="false">Google AI Edge Gallery</string>
+-  <string name="app_name_first_part" translatable="false">Google AI</string>
+-  <string name="app_name_second_part" translatable="false">Edge Gallery</string>
++  <string name="app_name" translatable="false">QSI Offline</string>
++  <string name="app_name_first_part" translatable="false">QSI</string>
++  <string name="app_name_second_part" translatable="false">Offline</string>
+   <string name="askimage_emptystate_title" translatable="false">Ask Image</string>
+   <string name="askimage_emptystate_content" translatable="false">To get started, tap the + below to add an image (max 10 images per chat) and type a prompt to ask a question about it!</string>
+   <string name="askimage_emptystate_content_aicore" translatable="false">To get started, tap the + below to add an image (max 1 image per chat) and type a prompt to ask a question about it!</string>
+   <string name="askaudio_emptystate_title" translatable="false">Ask Audio</string>
+   <string name="askaudio_emptystate_content" translatable="false">To get started, tap the + below to add a audio clip (limited to 1 clip up to 30 seconds) and type a prompt to transcribe or translate it!</string>
+-  <string name="gallery_news_notification_title" translatable="false">Gallery News</string>
++  <string name="gallery_news_notification_title" translatable="false">QSI Offline</string>
+   <string name="baseline" translatable="false">Baseline</string>
+   <string name="basic_info" translatable="false">Basic info</string>
+   <string name="benchmark" translatable="false">Benchmark</string>
+@@ -112,7 +112,7 @@
+   <string name="invalid_response" translatable="false">Invalid response</string>
+   <string name="learn_more" translatable="false">Learn more and see model license</string>
+   <string name="listening" translatable="false">Listening...</string>
+-  <string name="litert_community_label" translatable="false">LiteRT community</string>
++  <string name="litert_community_label" translatable="false">QSI</string>
+   <string name="loading_model_list" translatable="false">Loading model list...</string>
+   <string name="logs_viewer_filter_text_input_placeholder" translatable="false">Filter logs</string>
+   <string name="logs_viewer_title" translatable="false">Logs viewer</string>
+@@ -145,7 +145,7 @@
+   <string name="replace" translatable="false">Replace</string>
+   <string name="results" translatable="false">Results</string>
+   <string name="reset" translatable="false">Reset</string>
+-  <string name="reset_note" translatable="false">Tapping \"Reset\" will reset LiteRT-LM engine only. The game progress won\'t be affected.</string>
++  <string name="reset_note" translatable="false">Tapping \"Reset\" will reset the AI engine only. The game progress won\'t be affected.</string>
+   <string name="resetting_engine" translatable="false">Resetting engine...</string>
+   <string name="restore_default" translatable="false">Restore default</string>
+   <string name="reinitializing_description" translatable="false">The game progress won\'t be affected</string>
+@@ -174,7 +174,7 @@
+   <string name="test" translatable="false">Test</string>
+   <string name="text_image_generation_text_field_placeholder" translatable="false">Type prompt…</string>
+   <string name="text_input_placeholder_llm_chat" translatable="false">Type prompt…</string>
+-  <string name="tos_dialog_title_app" translatable="false">Welcome to Box</string>
++  <string name="tos_dialog_title_app" translatable="false">Welcome to QSI Offline</string>
+   <string name="tos_dialog_title_gemma" translatable="false">Gemma Terms of Use</string>
+   <string name="tos_dialog_accept_and_continue_button_label" translatable="false">Accept &amp; continue</string>
+   <string name="tos_dialog_agree_and_continue_button_label" translatable="false">Agree &amp; continue</string>
+diff --git a/Android/src/app/src/main/res/values/themes.xml b/Android/src/app/src/main/res/values/themes.xml
+index 2048f0d..fd6bf18 100644
+--- a/Android/src/app/src/main/res/values/themes.xml
++++ b/Android/src/app/src/main/res/values/themes.xml
+@@ -20,6 +20,8 @@
+   <style name="Theme.Gallery.SplashScreen" parent="Theme.SplashScreen">
+       <!-- Black splash screen background -->
+       <item name="windowSplashScreenBackground">#FF000000</item>
++      <item name="windowSplashScreenAnimatedIcon">@drawable/ic_app_icon_foreground</item>
++      <item name="windowSplashScreenIconBackgroundColor">#1E1B4B</item>
+       <item name="postSplashScreenTheme">@style/Theme.Gallery</item>
+   </style>
+   <style name="Theme.Gallery.OssLicenses" parent="Theme.AppCompat.Light.DarkActionBar">
+diff --git a/Android/src/smollm/build.gradle.kts b/Android/src/smollm/build.gradle.kts
+index 406bf3c..3431de9 100644
+--- a/Android/src/smollm/build.gradle.kts
++++ b/Android/src/smollm/build.gradle.kts
+@@ -9,6 +9,8 @@ android {
+     ndkVersion = "27.2.12479018"
+ 
+     defaultConfig {
++        // QSI Offline: phones are arm64; skipping the other ABIs cuts build time and APK size.
++        ndk { abiFilters += listOf("arm64-v8a") }
+         minSdk = 35
+         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+         consumerProguardFiles("consumer-rules.pro")
+diff --git a/Android/src/stablediffusion/build.gradle.kts b/Android/src/stablediffusion/build.gradle.kts
+index fc1f6ca..cd7a738 100644
+--- a/Android/src/stablediffusion/build.gradle.kts
++++ b/Android/src/stablediffusion/build.gradle.kts
+@@ -9,6 +9,8 @@ android {
+     ndkVersion = "27.2.12479018"
+ 
+     defaultConfig {
++        // QSI Offline: phones are arm64; skipping the other ABIs cuts build time and APK size.
++        ndk { abiFilters += listOf("arm64-v8a") }
+         minSdk = 30
+         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+         consumerProguardFiles("consumer-rules.pro")
+diff --git a/Android/src/whisper/build.gradle.kts b/Android/src/whisper/build.gradle.kts
+index f241bba..1a5b555 100644
+--- a/Android/src/whisper/build.gradle.kts
++++ b/Android/src/whisper/build.gradle.kts
+@@ -9,6 +9,8 @@ android {
+     ndkVersion = "27.2.12479018"
+ 
+     defaultConfig {
++        // QSI Offline: phones are arm64; skipping the other ABIs cuts build time and APK size.
++        ndk { abiFilters += listOf("arm64-v8a") }
+         minSdk = 30
+         externalNativeBuild {
+             cmake {
