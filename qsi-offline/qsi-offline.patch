@@ -46,23 +46,28 @@ index b8be89f..d363c2e 100644
          android:supportsRtl="true"
          android:theme="@style/Theme.Gallery"
 diff --git a/Android/src/app/src/main/assets/model_allowlist.json b/Android/src/app/src/main/assets/model_allowlist.json
-index d186837..ee83291 100644
+index d186837..bcf3718 100644
 --- a/Android/src/app/src/main/assets/model_allowlist.json
 +++ b/Android/src/app/src/main/assets/model_allowlist.json
-@@ -1,10 +1,10 @@
+@@ -1,13 +1,13 @@
  {
    "models": [
      {
 -      "name": "Gemma-4-E2B-it",
-+      "name": "QSI Core",
-       "modelId": "litert-community/gemma-4-E2B-it-litert-lm",
+-      "modelId": "litert-community/gemma-4-E2B-it-litert-lm",
 -      "modelFile": "gemma-4-E2B-it.litertlm",
 -      "description": "A variant of Gemma 4 E2B ready for deployment on Android using [LiteRT-LM](https://github.com/google-ai-edge/LiteRT-LM/blob/main/docs/api/kotlin/getting_started.md). It supports multi-modality input, with up to 32K context length. **Gemma 4 is now available!**",
++      "name": "QSI Core",
++      "modelId": "qsi/qsi-core",
 +      "modelFile": "qsi-core.litertlm",
 +      "description": "The QSI Offline AI engine. Runs entirely on this phone: chat, questions about photos and audio, and on-device tools. Nothing you type, say or show it leaves the device.",
        "sizeInBytes": 2583085056,
        "minDeviceMemoryInGb": 8,
-       "commitHash": "7fa1d78473894f7e736a21d920c3aa80f950c0db",
+-      "commitHash": "7fa1d78473894f7e736a21d920c3aa80f950c0db",
++      "commitHash": "1",
+       "llmSupportImage": true,
+       "llmSupportAudio": true,
+       "llmSupportThinking": true,
 @@ -33,139 +33,8 @@
          "llm_agent_chat",
          "llm_ask_image",
@@ -227,6 +232,27 @@ index 2678b8a..37ba48e 100644
        Text(
          "Authenticate to decrypt your chats",
          style = MaterialTheme.typography.bodyMedium,
+diff --git a/Android/src/app/src/main/java/com/google/ai/edge/gallery/customtasks/agentchat/AgentChatScreen.kt b/Android/src/app/src/main/java/com/google/ai/edge/gallery/customtasks/agentchat/AgentChatScreen.kt
+index ec66b65..8aca710 100644
+--- a/Android/src/app/src/main/java/com/google/ai/edge/gallery/customtasks/agentchat/AgentChatScreen.kt
++++ b/Android/src/app/src/main/java/com/google/ai/edge/gallery/customtasks/agentchat/AgentChatScreen.kt
+@@ -373,14 +373,8 @@ fun AgentChatScreen(
+             )
+             Text(
+               buildAnnotatedString {
+-                append("Use specialized, high-order reasoning by loading different skills or ")
+-                append(
+-                  buildTrackableUrlAnnotatedString(
+-                    url = "https://github.com/google-ai-edge/gallery/tree/main/skills",
+-                    linkText = "creating\u00A0your\u00A0own",
+-                  )
+-                )
+-                append(".\n\nTry tapping a sample prompt below to see Agent Skills in action!")
++                append("Use specialized, high-order reasoning by loading different skills or creating your own.")
++                append("\n\nTry tapping a sample prompt below to see Agent Skills in action!")
+               },
+               style =
+                 MaterialTheme.typography.headlineSmall.copy(fontSize = 16.sp, lineHeight = 22.sp),
 diff --git a/Android/src/app/src/main/java/com/google/ai/edge/gallery/customtasks/agentchat/AgentChatTaskModule.kt b/Android/src/app/src/main/java/com/google/ai/edge/gallery/customtasks/agentchat/AgentChatTaskModule.kt
 index ee8b9b3..fb215d2 100644
 --- a/Android/src/app/src/main/java/com/google/ai/edge/gallery/customtasks/agentchat/AgentChatTaskModule.kt
@@ -243,6 +269,37 @@ index ee8b9b3..fb215d2 100644
        textInputPlaceHolderRes = R.string.text_input_placeholder_llm_chat,
        defaultSystemPrompt =
          """
+diff --git a/Android/src/app/src/main/java/com/google/ai/edge/gallery/customtasks/agentchat/SkillManagerViewModel.kt b/Android/src/app/src/main/java/com/google/ai/edge/gallery/customtasks/agentchat/SkillManagerViewModel.kt
+index 1b26b5c..c805179 100644
+--- a/Android/src/app/src/main/java/com/google/ai/edge/gallery/customtasks/agentchat/SkillManagerViewModel.kt
++++ b/Android/src/app/src/main/java/com/google/ai/edge/gallery/customtasks/agentchat/SkillManagerViewModel.kt
+@@ -67,7 +67,7 @@ val TRYOUT_CHIPS: List<SkillTryOutChip> =
+     SkillTryOutChip(
+       icon = Icons.Outlined.Map,
+       label = "Interactive Map",
+-      prompt = "Show me Googleplex on interactive map.",
++      prompt = "Show me the Taj Mahal on an interactive map.",
+       skillName = "interactive-map",
+     ),
+     SkillTryOutChip(
+@@ -79,7 +79,7 @@ val TRYOUT_CHIPS: List<SkillTryOutChip> =
+     SkillTryOutChip(
+       icon = Icons.Outlined.Tag,
+       label = "Calculate Hash",
+-      prompt = "What is the sha1 hash of \"gemma\"?",
++      prompt = "What is the sha1 hash of \"hello world\"?",
+       skillName = "calculate-hash",
+     ),
+     SkillTryOutChip(
+@@ -116,7 +116,7 @@ val TRYOUT_CHIPS: List<SkillTryOutChip> =
+     SkillTryOutChip(
+       icon = Icons.Outlined.QrCode,
+       label = "Generate QR code",
+-      prompt = "Generate QR code for https://deepmind.google/models/gemma/",
++      prompt = "Generate QR code for https://www.quantumsi.in",
+       skillName = "qr-code",
+     ),
+   )
 diff --git a/Android/src/app/src/main/java/com/google/ai/edge/gallery/customtasks/examplecustomtask/ExampleCustomTask.kt b/Android/src/app/src/main/java/com/google/ai/edge/gallery/customtasks/examplecustomtask/ExampleCustomTask.kt
 index 4c391a3..fa3b5c5 100644
 --- a/Android/src/app/src/main/java/com/google/ai/edge/gallery/customtasks/examplecustomtask/ExampleCustomTask.kt
@@ -367,8 +424,32 @@ index e144c35..d7c3a1a 100644
          }
      }
  
+diff --git a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/common/DownloadAndTryButton.kt b/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/common/DownloadAndTryButton.kt
+index 72e98fe..7df51d8 100644
+--- a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/common/DownloadAndTryButton.kt
++++ b/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/common/DownloadAndTryButton.kt
+@@ -90,6 +90,8 @@ import kotlinx.coroutines.Dispatchers
+ import kotlinx.coroutines.launch
+ import kotlinx.coroutines.withContext
+ 
++private const val QSI_USE_HF_AUTH = false
++
+ private const val TAG = "AGDownloadAndTryButton"
+ private const val SYSTEM_RESERVED_MEMORY_IN_BYTES = 3 * (1L shl 30)
+ 
+@@ -259,7 +261,9 @@ fun DownloadAndTryButton(
+       if (needToDownloadFirst) {
+         downloadStarted = true
+         // For HuggingFace urls
+-        if (model.url.startsWith("https://huggingface.co")) {
++        // QSI Offline: the preset models are public downloads, so the Hugging Face login
++        // flow below is never entered. The build checks the URLs stay public.
++        if (QSI_USE_HF_AUTH && model.url.startsWith("https://huggingface.co")) {
+           checkingToken = true
+ 
+           // Check if the url needs auth.
 diff --git a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/home/ChatHistoryViewModel.kt b/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/home/ChatHistoryViewModel.kt
-index e210cca..82eda91 100644
+index e210cca..cdcadad 100644
 --- a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/home/ChatHistoryViewModel.kt
 +++ b/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/home/ChatHistoryViewModel.kt
 @@ -73,7 +73,7 @@ class ChatHistoryViewModel @Inject constructor(
@@ -380,6 +461,15 @@ index e210cca..82eda91 100644
                  sb.appendLine("Exported: ${fmt.format(Date())}")
                  sb.appendLine("Total conversations: ${conversations.size}")
                  sb.appendLine("=".repeat(72))
+@@ -91,7 +91,7 @@ class ChatHistoryViewModel @Inject constructor(
+                     }
+                     sb.appendLine("=".repeat(72))
+                 }
+-                val fileName = "box_chat_export_${System.currentTimeMillis()}.txt"
++                val fileName = "qsi_offline_chat_export_${System.currentTimeMillis()}.txt"
+                 val saved = saveToDownloads(context, fileName, sb.toString())
+                 withContext(Dispatchers.Main) {
+                     if (saved) Toast.makeText(context, "Saved to Downloads/$fileName", Toast.LENGTH_LONG).show()
 @@ -110,7 +110,7 @@ class ChatHistoryViewModel @Inject constructor(
              try {
                  val fmt = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
@@ -389,6 +479,15 @@ index e210cca..82eda91 100644
                  sb.appendLine("Conversation: ${conversation.title}")
                  if (conversation.modelName.isNotEmpty()) sb.appendLine("Model: ${conversation.modelName}")
                  sb.appendLine("Exported: ${fmt.format(Date())}")
+@@ -123,7 +123,7 @@ class ChatHistoryViewModel @Inject constructor(
+                     sb.appendLine()
+                 }
+                 val safeName = conversation.title.replace(Regex("[^a-zA-Z0-9]"), "_").take(30)
+-                val fileName = "box_${safeName}_${System.currentTimeMillis()}.txt"
++                val fileName = "qsi_offline_${safeName}_${System.currentTimeMillis()}.txt"
+                 val saved = saveToDownloads(context, fileName, sb.toString())
+                 withContext(Dispatchers.Main) {
+                     if (saved) Toast.makeText(context, "Saved to Downloads/$fileName", Toast.LENGTH_LONG).show()
 diff --git a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/home/HomeScreen.kt b/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/home/HomeScreen.kt
 index e2d37bd..9058d24 100644
 --- a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/home/HomeScreen.kt
@@ -431,19 +530,121 @@ index e2d37bd..9058d24 100644
    Text(
      introText,
 diff --git a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/home/SettingsDialog.kt b/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/home/SettingsDialog.kt
-index b1ba64d..634c2b6 100644
+index b1ba64d..8bc1b21 100644
 --- a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/home/SettingsDialog.kt
 +++ b/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/home/SettingsDialog.kt
-@@ -203,7 +203,7 @@ fun SettingsDialog(
-             verticalArrangement = Arrangement.spacedBy(4.dp),
-           ) {
-             Text(
+@@ -197,109 +197,7 @@ fun SettingsDialog(
+             }
+           }
+ 
+-          // HF Token management.
+-          Column(
+-            modifier = Modifier.fillMaxWidth().semantics(mergeDescendants = true) {},
+-            verticalArrangement = Arrangement.spacedBy(4.dp),
+-          ) {
+-            Text(
 -              "HuggingFace access token",
-+              "Download access token (advanced)",
-               style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Medium),
-             )
-             // Show the start of the token.
-@@ -410,10 +410,10 @@ fun SettingsDialog(
+-              style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Medium),
+-            )
+-            // Show the start of the token.
+-            val curHfToken = hfToken
+-            if (curHfToken != null && curHfToken.accessToken.isNotEmpty()) {
+-              Text(
+-                curHfToken.accessToken.substring(0, min(16, curHfToken.accessToken.length)) + "...",
+-                style = MaterialTheme.typography.bodyMedium,
+-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+-              )
+-              Text(
+-                "Expires at: ${dateFormatter.format(Instant.ofEpochMilli(curHfToken.expiresAtMs))}",
+-                style = MaterialTheme.typography.bodyMedium,
+-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+-              )
+-            } else {
+-              Text(
+-                "Not available",
+-                style = MaterialTheme.typography.bodyMedium,
+-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+-              )
+-              Text(
+-                "The token will be automatically retrieved when a gated model is downloaded",
+-                style = MaterialTheme.typography.bodySmall,
+-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+-              )
+-            }
+-            Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+-              OutlinedButton(
+-                onClick = {
+-                  modelManagerViewModel.clearAccessToken()
+-                  hfToken = null
+-                },
+-                enabled = curHfToken != null,
+-              ) {
+-                Text("Clear")
+-              }
+-              val handleSaveToken = {
+-                modelManagerViewModel.saveAccessToken(
+-                  accessToken = customHfToken,
+-                  refreshToken = "",
+-                  expiresAt = System.currentTimeMillis() + 1000L * 60 * 60 * 24 * 365 * 10,
+-                )
+-                hfToken = modelManagerViewModel.getTokenStatusAndData().data
+-                focusManager.clearFocus()
+-              }
+-              BasicTextField(
+-                value = customHfToken,
+-                singleLine = true,
+-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+-                keyboardActions = KeyboardActions(onDone = { handleSaveToken() }),
+-                modifier =
+-                  Modifier.fillMaxWidth()
+-                    .padding(top = 4.dp)
+-                    .focusRequester(focusRequester)
+-                    .onFocusChanged { isFocused = it.isFocused },
+-                onValueChange = { customHfToken = it },
+-                textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface),
+-                cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface),
+-              ) { innerTextField ->
+-                Box(
+-                  modifier =
+-                    Modifier.border(
+-                        width = if (isFocused) 2.dp else 1.dp,
+-                        color =
+-                          if (isFocused) MaterialTheme.colorScheme.primary
+-                          else MaterialTheme.colorScheme.outline,
+-                        shape = CircleShape,
+-                      )
+-                      .height(40.dp),
+-                  contentAlignment = Alignment.CenterStart,
+-                ) {
+-                  Row(verticalAlignment = Alignment.CenterVertically) {
+-                    Box(modifier = Modifier.padding(start = 16.dp).weight(1f)) {
+-                      if (customHfToken.isEmpty()) {
+-                        Text(
+-                          "Enter token manually",
+-                          color = MaterialTheme.colorScheme.onSurfaceVariant,
+-                          style = MaterialTheme.typography.bodySmall,
+-                        )
+-                      }
+-                      innerTextField()
+-                    }
+-                    if (customHfToken.isNotEmpty()) {
+-                      IconButton(modifier = Modifier.offset(x = 1.dp), onClick = handleSaveToken) {
+-                        Icon(
+-                          Icons.Rounded.CheckCircle,
+-                          contentDescription = stringResource(R.string.cd_done_icon),
+-                        )
+-                      }
+-                    }
+-                  }
+-                }
+-              }
+-            }
+-          }
++          // QSI Offline: the download-token section went with the Hugging Face login flow.
+ 
+           // Box: Biometric lock toggle
+           val dbEncEnabled by BiometricEncryptionManager.isEnabledFlow.collectAsState()
+@@ -410,10 +308,10 @@ fun SettingsDialog(
                style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Medium),
              )
              Text(
@@ -458,7 +659,7 @@ index b1ba64d..634c2b6 100644
                style = MaterialTheme.typography.bodySmall,
                color = MaterialTheme.colorScheme.onSurfaceVariant,
              )
-@@ -447,24 +447,22 @@ fun SettingsDialog(
+@@ -447,24 +345,22 @@ fun SettingsDialog(
                style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Medium),
              )
              Text(
@@ -493,7 +694,7 @@ index b1ba64d..634c2b6 100644
              )
            }
  
-@@ -475,16 +473,13 @@ fun SettingsDialog(
+@@ -475,16 +371,13 @@ fun SettingsDialog(
                style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Medium),
              )
              // Removed "View App Terms of Service" button
@@ -514,6 +715,29 @@ index b1ba64d..634c2b6 100644
            }
          }
  
+diff --git a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/llmchat/LlmChatModelHelper.kt b/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/llmchat/LlmChatModelHelper.kt
+index 661fd37..a15b80b 100644
+--- a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/llmchat/LlmChatModelHelper.kt
++++ b/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/llmchat/LlmChatModelHelper.kt
+@@ -143,7 +143,8 @@ object LlmChatModelHelper : LlmModelHelper {
+       ExperimentalFlags.enableConversationConstrainedDecoding = false
+       model.instance = LlmModelInstance(engine = engine, conversation = conversation)
+     } catch (e: Exception) {
+-      onDone(cleanUpMediapipeTaskErrorMessage(e.message ?: "Unknown error"))
++      Log.e(TAG, "Model initialization failed", e)
++      onDone("QSI Core could not start on this device. Try another accelerator in settings, or download it again.")
+       return
+     }
+     onDone("")
+@@ -293,7 +294,7 @@ object LlmChatModelHelper : LlmModelHelper {
+             resultListener("", true, null)
+           } else {
+             Log.e(TAG, "onError", throwable)
+-            onError("Error: ${throwable.message}")
++            onError("Something went wrong while generating a reply. Please try again.")
+           }
+         }
+       },
 diff --git a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/llmchat/LlmChatTaskModule.kt b/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/llmchat/LlmChatTaskModule.kt
 index e954b3a..b77b67d 100644
 --- a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/llmchat/LlmChatTaskModule.kt
@@ -570,6 +794,19 @@ index dab3ea7..4ffa979 100644
        textInputPlaceHolderRes = R.string.text_input_placeholder_llm_chat,
      )
  
+diff --git a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/llmsingleturn/PromptTemplateConfigs.kt b/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/llmsingleturn/PromptTemplateConfigs.kt
+index e60b84d..6fc2fbc 100644
+--- a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/llmsingleturn/PromptTemplateConfigs.kt
++++ b/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/llmsingleturn/PromptTemplateConfigs.kt
+@@ -193,7 +193,7 @@ enum class PromptTemplateType(
+     examplePrompts =
+       listOf(
+         "Create an alert box that says \"Hello, World!\"",
+-        "Declare an immutable variable named 'appName' with the value \"AI Gallery\"",
++        "Declare an immutable variable named 'appName' with the value \"QSI Offline\"",
+         "Print the numbers from 1 to 5 using a for loop.",
+         "Write a function that returns the square of an integer input.",
+       ),
 diff --git a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/modelmanager/GlobalModelManager.kt b/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/modelmanager/GlobalModelManager.kt
 index 1e45e29..e79639d 100644
 --- a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/modelmanager/GlobalModelManager.kt
@@ -806,6 +1043,24 @@ index 2b6df02..73b1521 100644
              _uiState.value = _uiState.value.copy(
                  isTranscribing = false,
                  transcript = result.ifEmpty { _uiState.value.transcript },
+diff --git a/Android/src/app/src/main/java/com/google/ai/edge/gallery/worker/DownloadWorker.kt b/Android/src/app/src/main/java/com/google/ai/edge/gallery/worker/DownloadWorker.kt
+index 72ada69..c5f2344 100644
+--- a/Android/src/app/src/main/java/com/google/ai/edge/gallery/worker/DownloadWorker.kt
++++ b/Android/src/app/src/main/java/com/google/ai/edge/gallery/worker/DownloadWorker.kt
+@@ -324,7 +324,12 @@ class DownloadWorker(context: Context, params: WorkerParameters) :
+         } catch (e: IOException) {
+           Log.e(TAG, e.message, e)
+           Result.failure(
+-            Data.Builder().putString(KEY_MODEL_DOWNLOAD_ERROR_MESSAGE, e.message).build()
++            Data.Builder()
++              .putString(
++                KEY_MODEL_DOWNLOAD_ERROR_MESSAGE,
++                "Download failed. Check your connection and try again.",
++              )
++              .build()
+           )
+         }
+       }
 diff --git a/Android/src/app/src/main/res/drawable/ic_app_icon_background.xml b/Android/src/app/src/main/res/drawable/ic_app_icon_background.xml
 index dd7e7f1..279097d 100644
 --- a/Android/src/app/src/main/res/drawable/ic_app_icon_background.xml
@@ -915,7 +1170,7 @@ index 69b30fb..bb0a8a4 100644
    </style>
    <style name="Theme.Gallery.OssLicenses" parent="Theme.AppCompat">
 diff --git a/Android/src/app/src/main/res/values/strings.xml b/Android/src/app/src/main/res/values/strings.xml
-index dd16e90..512d83e 100644
+index dd16e90..72de01d 100644
 --- a/Android/src/app/src/main/res/values/strings.xml
 +++ b/Android/src/app/src/main/res/values/strings.xml
 @@ -26,15 +26,15 @@
@@ -965,6 +1220,15 @@ index dd16e90..512d83e 100644
    <string name="tos_dialog_title_gemma" translatable="false">Gemma Terms of Use</string>
    <string name="tos_dialog_accept_and_continue_button_label" translatable="false">Accept &amp; continue</string>
    <string name="tos_dialog_agree_and_continue_button_label" translatable="false">Agree &amp; continue</string>
+@@ -253,7 +253,7 @@
+   <string name="add_skill_manual_input_sheet_title" translatable="false">Create a skill</string>
+   <string name="agent_skills" translatable="false">Agent Skills</string>
+   <string name="agent_skills_description" translatable="false">Use specialized, high-order reasoning by loading different skills or creating your own.\n\nTry tapping a sample prompt below to see Agent Skills in action!</string>
+-  <string name="disclaimer_dialog_content" translatable="false">Third-party skills are not authored or endorsed by Google. Google is not responsible for their contents, security, or data handling practices.
++  <string name="disclaimer_dialog_content" translatable="false">Third-party skills are not authored or endorsed by Quantum SI. Quantum SI is not responsible for their contents, security, or data handling practices.
+ 
+ Please exercise caution before providing sensitive information, such as personal identification, tokens, or API keys.
+ 
 diff --git a/Android/src/app/src/main/res/values/themes.xml b/Android/src/app/src/main/res/values/themes.xml
 index 2048f0d..fd6bf18 100644
 --- a/Android/src/app/src/main/res/values/themes.xml
