@@ -37,17 +37,34 @@ jobs:
       # signature stable between builds, so a newer APK installs over an older one.
       # If the cache is evicted (7 days unused) a new key is made and the next
       # install needs the old copy removed first.
+      # The app's two preset models must stay downloadable with no account, or the
+      # download button would fail. Checked before spending ten minutes compiling.
+      - name: Check preset models download without a login
+        run: |
+          set -euo pipefail
+          while read -r url; do
+            [ -n "$url" ] || continue
+            code=$(curl -sIL -o /dev/null -w '%{http_code}' "$url")
+            echo "$code  $url"
+            [ "$code" = "200" ] || { echo "::error::needs a login or is missing (HTTP $code): $url"; exit 1; }
+          done < qsi-offline/MODEL_URLS
+
       - name: Restore signing key
         uses: actions/cache@v4
         with:
-          path: ~/.android/debug.keystore
+          path: /home/runner/.android/debug.keystore
           key: qsi-offline-debug-keystore-v1
 
       - name: Build
         env:
           QSI_VERSION_CODE: ${{ github.run_number }}
           QSI_VERSION_NAME: 1.0.${{ github.run_number }}
+          # Pins where the debug keystore lives so the cache above actually catches it.
+          ANDROID_USER_HOME: /home/runner/.android
         run: qsi-offline/build.sh "$RUNNER_TEMP/box"
+
+      - name: Report signing key location
+        run: find /home/runner -name debug.keystore 2>/dev/null || true
 
       - name: Collect APK
         run: |

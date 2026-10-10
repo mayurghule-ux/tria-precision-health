@@ -228,18 +228,70 @@ index 2678b8a..37ba48e 100644
          "Authenticate to decrypt your chats",
          style = MaterialTheme.typography.bodyMedium,
 diff --git a/Android/src/app/src/main/java/com/google/ai/edge/gallery/customtasks/agentchat/AgentChatTaskModule.kt b/Android/src/app/src/main/java/com/google/ai/edge/gallery/customtasks/agentchat/AgentChatTaskModule.kt
-index ee8b9b3..d1f2c49 100644
+index ee8b9b3..fb215d2 100644
 --- a/Android/src/app/src/main/java/com/google/ai/edge/gallery/customtasks/agentchat/AgentChatTaskModule.kt
 +++ b/Android/src/app/src/main/java/com/google/ai/edge/gallery/customtasks/agentchat/AgentChatTaskModule.kt
-@@ -48,7 +48,7 @@ class AgentChatTask @Inject constructor() : CustomTask {
+@@ -48,9 +48,8 @@ class AgentChatTask @Inject constructor() : CustomTask {
        models = mutableListOf(),
        description = "Chat with on-device large language models with skills and tools",
        shortDescription = "Complete agentic tasks with chat",
 -      docUrl = "https://github.com/google-ai-edge/LiteRT-LM/blob/main/kotlin/README.md",
+-      sourceCodeUrl =
+-        "https://github.com/google-ai-edge/gallery/blob/main/Android/src/app/src/main/java/com/google/ai/edge/gallery/customtasks/agentchat/",
 +      docUrl = "",
-       sourceCodeUrl =
-         "https://github.com/google-ai-edge/gallery/blob/main/Android/src/app/src/main/java/com/google/ai/edge/gallery/customtasks/agentchat/",
++      sourceCodeUrl = "",
        textInputPlaceHolderRes = R.string.text_input_placeholder_llm_chat,
+       defaultSystemPrompt =
+         """
+diff --git a/Android/src/app/src/main/java/com/google/ai/edge/gallery/customtasks/examplecustomtask/ExampleCustomTask.kt b/Android/src/app/src/main/java/com/google/ai/edge/gallery/customtasks/examplecustomtask/ExampleCustomTask.kt
+index 4c391a3..fa3b5c5 100644
+--- a/Android/src/app/src/main/java/com/google/ai/edge/gallery/customtasks/examplecustomtask/ExampleCustomTask.kt
++++ b/Android/src/app/src/main/java/com/google/ai/edge/gallery/customtasks/examplecustomtask/ExampleCustomTask.kt
+@@ -69,10 +69,8 @@ class ExampleCustomTask @Inject constructor() : CustomTask {
+           "model file (with text content for demonstration purpose). The \"models\" listed " +
+           "below are configured in different ways in terms of how the model file is provided " +
+           "(pushed to device manually, vs downloaded from internet).",
+-      docUrl =
+-        "https://github.com/google-ai-edge/gallery/Android/src/app/src/main/java/com/google/ai/edge/gallery/customtasks/common/CustomTask.kt",
+-      sourceCodeUrl =
+-        "https://github.com/google-ai-edge/gallery/Android/src/app/src/main/java/com/google/ai/edge/gallery/customtasks/examplecustomtask/ExampleCustomTask.kt",
++      docUrl = "",
++      sourceCodeUrl = "",
+       models =
+         mutableListOf(
+           Model(
+diff --git a/Android/src/app/src/main/java/com/google/ai/edge/gallery/customtasks/mobileactions/MobileActionsTask.kt b/Android/src/app/src/main/java/com/google/ai/edge/gallery/customtasks/mobileactions/MobileActionsTask.kt
+index 592a608..cff75f2 100644
+--- a/Android/src/app/src/main/java/com/google/ai/edge/gallery/customtasks/mobileactions/MobileActionsTask.kt
++++ b/Android/src/app/src/main/java/com/google/ai/edge/gallery/customtasks/mobileactions/MobileActionsTask.kt
+@@ -52,9 +52,8 @@ class MobileActionsTask @Inject constructor() : CustomTask {
+       label = "Mobile Actions",
+       description = "Perform various device actions through Function Gemma",
+       shortDescription = "Leverage device mobile actions",
+-      docUrl = "https://github.com/google-ai-edge/LiteRT-LM/blob/main/kotlin/README.md",
+-      sourceCodeUrl =
+-        "https://github.com/google-ai-edge/gallery/blob/main/Android/src/app/src/main/java/com/google/ai/edge/gallery/customtasks/mobileactions",
++      docUrl = "",
++      sourceCodeUrl = "",
+       category = Category.LLM,
+       icon = Icons.Outlined.Functions,
+       agentNameRes = R.string.chat_agent_agent_name,
+diff --git a/Android/src/app/src/main/java/com/google/ai/edge/gallery/customtasks/tinygarden/TinyGardenTask.kt b/Android/src/app/src/main/java/com/google/ai/edge/gallery/customtasks/tinygarden/TinyGardenTask.kt
+index 4dbd8af..694b13c 100644
+--- a/Android/src/app/src/main/java/com/google/ai/edge/gallery/customtasks/tinygarden/TinyGardenTask.kt
++++ b/Android/src/app/src/main/java/com/google/ai/edge/gallery/customtasks/tinygarden/TinyGardenTask.kt
+@@ -88,9 +88,8 @@ class TinyGardenTask @Inject constructor() : CustomTask {
+       description =
+         "Use natural language to plant, water, and harvest in this fully offline mini-game.\n\nNote: This is powered by the experimental FunctionGemma model optimized for latency. Due to its compact size (270M), it works well on simple instructions but responses may vary to more complex interactions.",
+       shortDescription = "Use natural language to plant",
+-      docUrl = "https://github.com/google-ai-edge/LiteRT-LM/blob/main/kotlin/README.md",
+-      sourceCodeUrl =
+-        "https://github.com/google-ai-edge/gallery/blob/main/Android/src/app/src/main/java/com/google/ai/edge/gallery/customtasks/tinygarden",
++      docUrl = "",
++      sourceCodeUrl = "",
+       category = Category.LLM,
+       icon = Icons.Outlined.LocalFlorist,
+       agentNameRes = R.string.chat_agent_agent_name,
 diff --git a/Android/src/app/src/main/java/com/google/ai/edge/gallery/data/DownloadRepository.kt b/Android/src/app/src/main/java/com/google/ai/edge/gallery/data/DownloadRepository.kt
 index 76a676e..fafb926 100644
 --- a/Android/src/app/src/main/java/com/google/ai/edge/gallery/data/DownloadRepository.kt
@@ -463,49 +515,61 @@ index b1ba64d..634c2b6 100644
          }
  
 diff --git a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/llmchat/LlmChatTaskModule.kt b/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/llmchat/LlmChatTaskModule.kt
-index e954b3a..d4dbf38 100644
+index e954b3a..b77b67d 100644
 --- a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/llmchat/LlmChatTaskModule.kt
 +++ b/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/llmchat/LlmChatTaskModule.kt
-@@ -65,7 +65,7 @@ class LlmChatTask @Inject constructor() : CustomTask {
+@@ -65,9 +65,8 @@ class LlmChatTask @Inject constructor() : CustomTask {
        models = mutableListOf(),
        description = "Chat with on-device large language models",
        shortDescription = "Chat with an on-device LLM",
 -      docUrl = "https://github.com/google-ai-edge/LiteRT-LM/blob/main/kotlin/README.md",
+-      sourceCodeUrl =
+-        "https://github.com/google-ai-edge/gallery/blob/main/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/llmchat/LlmChatModelHelper.kt",
 +      docUrl = "",
-       sourceCodeUrl =
-         "https://github.com/google-ai-edge/gallery/blob/main/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/llmchat/LlmChatModelHelper.kt",
++      sourceCodeUrl = "",
        textInputPlaceHolderRes = R.string.text_input_placeholder_llm_chat,
-@@ -152,7 +152,7 @@ class LlmAskImageTask @Inject constructor() : CustomTask {
+     )
+ 
+@@ -152,9 +151,8 @@ class LlmAskImageTask @Inject constructor() : CustomTask {
        models = mutableListOf(),
        description = "Ask questions about images with on-device large language models",
        shortDescription = "Ask questions about images",
 -      docUrl = "https://github.com/google-ai-edge/LiteRT-LM/blob/main/kotlin/README.md",
+-      sourceCodeUrl =
+-        "https://github.com/google-ai-edge/gallery/blob/main/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/llmchat/LlmChatModelHelper.kt",
 +      docUrl = "",
-       sourceCodeUrl =
-         "https://github.com/google-ai-edge/gallery/blob/main/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/llmchat/LlmChatModelHelper.kt",
++      sourceCodeUrl = "",
        textInputPlaceHolderRes = R.string.text_input_placeholder_llm_chat,
-@@ -217,7 +217,7 @@ class LlmAskAudioTask @Inject constructor() : CustomTask {
+     )
+ 
+@@ -217,9 +215,8 @@ class LlmAskAudioTask @Inject constructor() : CustomTask {
        description =
          "Instantly transcribe and/or translate audio clips using on-device large language models",
        shortDescription = "Transcribe and translate audio",
 -      docUrl = "https://github.com/google-ai-edge/LiteRT-LM/blob/main/kotlin/README.md",
+-      sourceCodeUrl =
+-        "https://github.com/google-ai-edge/gallery/blob/main/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/llmchat/LlmChatModelHelper.kt",
 +      docUrl = "",
-       sourceCodeUrl =
-         "https://github.com/google-ai-edge/gallery/blob/main/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/llmchat/LlmChatModelHelper.kt",
++      sourceCodeUrl = "",
        textInputPlaceHolderRes = R.string.text_input_placeholder_llm_chat,
+     )
+ 
 diff --git a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/llmsingleturn/LlmSingleTurnTaskModule.kt b/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/llmsingleturn/LlmSingleTurnTaskModule.kt
-index dab3ea7..a90597d 100644
+index dab3ea7..4ffa979 100644
 --- a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/llmsingleturn/LlmSingleTurnTaskModule.kt
 +++ b/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/llmsingleturn/LlmSingleTurnTaskModule.kt
-@@ -46,7 +46,7 @@ class LlmSingleTurnTask @Inject constructor() : CustomTask {
+@@ -46,9 +46,8 @@ class LlmSingleTurnTask @Inject constructor() : CustomTask {
        models = mutableListOf(),
        description = "Single turn use cases with on-device large language models",
        shortDescription = "Single turn use cases",
 -      docUrl = "https://github.com/google-ai-edge/LiteRT-LM/blob/main/kotlin/README.md",
+-      sourceCodeUrl =
+-        "https://github.com/google-ai-edge/gallery/blob/main/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/llmchat/LlmChatModelHelper.kt",
 +      docUrl = "",
-       sourceCodeUrl =
-         "https://github.com/google-ai-edge/gallery/blob/main/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/llmchat/LlmChatModelHelper.kt",
++      sourceCodeUrl = "",
        textInputPlaceHolderRes = R.string.text_input_placeholder_llm_chat,
+     )
+ 
 diff --git a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/modelmanager/GlobalModelManager.kt b/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/modelmanager/GlobalModelManager.kt
 index 1e45e29..e79639d 100644
 --- a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/modelmanager/GlobalModelManager.kt
