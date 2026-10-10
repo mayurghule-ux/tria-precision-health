@@ -80,15 +80,18 @@ jobs:
           assert names == ["QSI Core"], names
           '
 
-          # Upstream display names that must not reach the UI.
-          STRINGS=$(unzip -p "$APK" 'classes*.dex' | strings)
+          # Upstream display names that must not reach the UI. Grep a file rather
+          # than a pipe: under pipefail, grep -q exiting early on a match makes the
+          # echo feeding it fail with SIGPIPE, which inverts the result.
+          DEX_STRINGS="$RUNNER_TEMP/dex-strings.txt"
+          unzip -p "$APK" 'classes*.dex' | strings > "$DEX_STRINGS"
           for banned in "Whisper Tiny" "Whisper Base" "Whisper Small" "Gemma-4-E2B-it" \
                         "Box is a privacy-focused fork" "Developed by Jegly"; do
-            if echo "$STRINGS" | grep -qF "$banned"; then
+            if grep -qF "$banned" "$DEX_STRINGS"; then
               echo "::error::found upstream name in the app: $banned"; exit 1
             fi
           done
-          echo "$STRINGS" | grep -qF "QSI Voice" || { echo "::error::QSI Voice missing"; exit 1; }
+          grep -qF "QSI Voice" "$DEX_STRINGS" || { echo "::error::QSI Voice missing"; exit 1; }
           echo "Branding and presets verified."
 
       - uses: actions/upload-artifact@v4
