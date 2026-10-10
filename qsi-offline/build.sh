@@ -23,8 +23,9 @@ git remote add origin "$BOX_REPO"
 git fetch -q --depth 1 origin "$BOX_COMMIT"
 git checkout -q FETCH_HEAD
 
-# Native engines are submodules pinned by Box. Shallow-fetch exactly those commits.
-git submodule update --init --depth 1 --jobs 3
+# Native engines are submodules pinned by Box, and stable-diffusion.cpp nests its own
+# ggml submodule, so fetch recursively. Shallow-fetch exactly the pinned commits.
+git submodule update --init --recursive --depth 1 --jobs 3
 
 git apply --whitespace=nowarn "$HERE/qsi-offline.patch"
 echo "QSI patch applied."
