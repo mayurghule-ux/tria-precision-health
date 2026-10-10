@@ -4,6 +4,11 @@ name: Publish QSI Offline APK
 # GitHub Release, which gives a direct .apk link that needs no unzip.
 
 on:
+  # Manual dispatch only works from the default branch, so a branch can publish
+  # by committing the run id to qsi-offline/PUBLISH_RUN_ID instead.
+  push:
+    branches: [main, "claude/**"]
+    paths: ["qsi-offline/PUBLISH_RUN_ID"]
   workflow_dispatch:
     inputs:
       run_id:
@@ -19,10 +24,20 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
+      - uses: actions/checkout@v4
+
+      - name: Resolve run id
+        id: run
+        run: |
+          RUN_ID="${{ inputs.run_id }}"
+          [ -n "$RUN_ID" ] || RUN_ID=$(tr -d '[:space:]' < qsi-offline/PUBLISH_RUN_ID)
+          echo "id=$RUN_ID" >> "$GITHUB_OUTPUT"
+          echo "Publishing APK from run $RUN_ID"
+
       - uses: actions/download-artifact@v4
         with:
           pattern: qsi-offline-apk-*
-          run-id: ${{ inputs.run_id }}
+          run-id: ${{ steps.run.outputs.id }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
           merge-multiple: true
           path: dist
@@ -40,7 +55,7 @@ jobs:
             gh release upload "$TAG" "$APK" --clobber
           else
             gh release create "$TAG" "$APK" --title "QSI Offline $VERSION" \
-              --notes "Built by run ${{ inputs.run_id }}. Android 15 or newer. Install the .apk below."
+              --notes "Built by run ${{ steps.run.outputs.id }}. Android 15 or newer. Install the .apk below."
           fi
           URL="https://github.com/$GH_REPO/releases/download/$TAG/$(basename "$APK")"
           echo "Direct link: $URL"
