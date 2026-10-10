@@ -778,6 +778,19 @@ index e954b3a..b77b67d 100644
        textInputPlaceHolderRes = R.string.text_input_placeholder_llm_chat,
      )
  
+diff --git a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/llmchat/LlmChatViewModel.kt b/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/llmchat/LlmChatViewModel.kt
+index 83b49b9..9baf115 100644
+--- a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/llmchat/LlmChatViewModel.kt
++++ b/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/llmchat/LlmChatViewModel.kt
+@@ -404,7 +404,7 @@ open class LlmChatViewModelBase() : ChatViewModel() {
+         Log.e(TAG, "Error occurred while running inference", e)
+         setInProgress(false)
+         setPreparing(false)
+-        onError(e.message ?: "")
++        onError("Something went wrong while generating a reply. Please try again.")
+       }
+     }
+   }
 diff --git a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/llmsingleturn/LlmSingleTurnTaskModule.kt b/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/llmsingleturn/LlmSingleTurnTaskModule.kt
 index dab3ea7..4ffa979 100644
 --- a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/llmsingleturn/LlmSingleTurnTaskModule.kt
