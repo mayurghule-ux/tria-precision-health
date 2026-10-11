@@ -6,8 +6,9 @@ For a tablet or phone plugged into the PC by USB.
    Settings → Developer options → turn on **USB debugging**.
    (On Samsung devices, Build number is under About tablet → **Software information**.)
 2. Plug the device into the PC and unlock its screen.
-3. Download both files in this folder to the same place and double-click
-   **Install-QSI-Offline.bat**.
+3. Save **Install-QSI-Offline.bat** and **Install-QSI-Offline.ps1** into the same folder
+   (on GitHub, open each file and use its *Download raw file* button; a browser may warn
+   about the .bat, choose Keep) and double-click **Install-QSI-Offline.bat**.
 4. When the device asks "Allow USB debugging?", tick *Always allow* and tap **Allow**.
    If the prompt does not appear, unplug the cable and plug it back in.
 
