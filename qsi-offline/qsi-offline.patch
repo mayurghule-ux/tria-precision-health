@@ -1471,7 +1471,7 @@ index 2f99969..7a9d8e2 100644
 +val surfaceBrightDark = Color(0xFF34343F)
  val scrimDark = Color(0xFF000000)
 diff --git a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/theme/Theme.kt b/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/theme/Theme.kt
-index cfdbaca..5e9e81f 100644
+index cfdbaca..ee5f1b6 100644
 --- a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/theme/Theme.kt
 +++ b/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/theme/Theme.kt
 @@ -146,8 +146,8 @@ val LocalCustomColors = staticCompositionLocalOf { CustomColors() }
@@ -1498,13 +1498,13 @@ index cfdbaca..5e9e81f 100644
 -        // dark grey gradient
 -        listOf(Color(0xFF4A4A4A), Color(0xFF2C2C2C)),
 +        // violet
-+        listOf(Color(0xFFF5F3FF), Color(0xFFEDE9FE)),
++        listOf(Color(0xFF7C3AED), Color(0xFF6D28D9)),
 +        // blue
-+        listOf(Color(0xFFEFF6FF), Color(0xFFDBEAFE)),
++        listOf(Color(0xFF3B82F6), Color(0xFF2563EB)),
 +        // teal
-+        listOf(Color(0xFFECFEFF), Color(0xFFCFFAFE)),
++        listOf(Color(0xFF0891B2), Color(0xFF0E7490)),
 +        // lavender
-+        listOf(Color(0xFFFAF5FF), Color(0xFFF3E8FF)),
++        listOf(Color(0xFF8B5CF6), Color(0xFF7C3AED)),
        ),
      taskIconColors =
        listOf(
@@ -1521,7 +1521,7 @@ index cfdbaca..5e9e81f 100644
 +        // blue
 +        Color(0xFF2563EB),
 +        // teal
-+        Color(0xFF0891B2),
++        Color(0xFF0E7490),
 +        // deep violet
 +        Color(0xFF7C3AED),
        ),
@@ -1578,13 +1578,13 @@ index cfdbaca..5e9e81f 100644
 -        // green gradient 3
 -        Color(0xFF1A331A),
 +        // violet
-+        Color(0xFF6D28D9),
++        Color(0xFF9F7AEA),
 +        // blue
-+        Color(0xFF2563EB),
++        Color(0xFF3B82F6),
 +        // teal
 +        Color(0xFF0891B2),
 +        // deep violet
-+        Color(0xFF7C3AED),
++        Color(0xFF8B5CF6),
        ),
 -    taskIconShapeBgColor = Color(0xFF202124),
 -    homeBottomGradient = listOf(Color(0x00F8F9FF), Color(0x1AF6AD01)),
@@ -1610,6 +1610,23 @@ index cfdbaca..5e9e81f 100644
  
    // Derive custom colors from the dynamic scheme for backward compatibility
    val customColorsPalette = if (darkTheme) {
+@@ -340,12 +336,14 @@ fun GalleryTheme(content: @Composable () -> Unit) {
+       userBubbleBgColor = colorScheme.primaryContainer,
+       agentBubbleBgColor = colorScheme.surfaceContainerHigh,
+       linkColor = colorScheme.primary,
+-      tabHeaderBgColor = colorScheme.primary,
++      // White tab label: needs the deep violet, not the pale primary of the dark scheme.
++      tabHeaderBgColor = colorScheme.primaryContainer,
+       taskCardBgColor = colorScheme.surfaceContainerHigh,
+     )
+   } else {
+     lightCustomColors.copy(
+-      userBubbleBgColor = colorScheme.primaryContainer,
++      // User messages are drawn in white: use the brand violet, not its pale container.
++      userBubbleBgColor = colorScheme.primary,
+       agentBubbleBgColor = colorScheme.surfaceContainerHigh,
+       linkColor = colorScheme.primary,
+       tabHeaderBgColor = colorScheme.primary,
 diff --git a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/whisper/WhisperScreen.kt b/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/whisper/WhisperScreen.kt
 index 49fffaf..a4f732b 100644
 --- a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/whisper/WhisperScreen.kt
