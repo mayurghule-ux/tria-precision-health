@@ -20,13 +20,35 @@ $ErrorActionPreference = 'Stop'
 $ProgressPreference = 'SilentlyContinue'   # Invoke-WebRequest is much faster without the progress bar
 
 # CI publishes a new release, 1.0.<run number>, on every push that touches qsi-offline/**,
-# and each one carries a higher Android version code. This installer pins one release. A
+# and each one carries a higher Android version code. The installer asks GitHub for the newest
+# "qsi-offline-v*" release and falls back to the release below when that lookup fails. A
 # tablet that already has a newer one is left alone; see INSTALL_FAILED_VERSION_DOWNGRADE below.
+$Repo     = 'mayurghule-ux/tria-precision-health'
 $Version  = '1.0.9'
-$ApkUrl   = "https://github.com/mayurghule-ux/tria-precision-health/releases/download/qsi-offline-v$Version/QSI-Offline-$Version.apk"
-$ApkBytes = 395660002   # exact size of the release asset; update together with $Version
+$ApkUrl   = "https://github.com/$Repo/releases/download/qsi-offline-v$Version/QSI-Offline-$Version.apk"
+$ApkBytes = 395660002   # exact size of that release asset; update together with $Version
 $ToolsUrl = 'https://dl.google.com/android/repository/platform-tools-latest-windows.zip'
 $Package  = 'in.quantumsi.offline'
+
+# Returns the newest QSI Offline release as @{ Version; Url; Bytes }, or $null when GitHub
+# cannot be reached. Releases are listed newest first, but sort by version anyway.
+function Get-LatestRelease {
+    try {
+        $releases = Invoke-RestMethod -Uri "https://api.github.com/repos/$Repo/releases?per_page=30" -UseBasicParsing `
+            -Headers @{ 'User-Agent' = 'QSI-Offline-Installer'; 'Accept' = 'application/vnd.github+json' }
+    } catch { return $null }
+    $best = $null
+    foreach ($r in @($releases)) {
+        if ($r.draft -or $r.prerelease -or "$($r.tag_name)" -notmatch '^qsi-offline-v(\d+\.\d+\.\d+)$') { continue }
+        $v = [Version]$Matches[1]
+        $asset = @($r.assets) | Where-Object { "$($_.name)" -like '*.apk' } | Select-Object -First 1
+        if ($null -eq $asset -or -not $asset.size) { continue }
+        if ($null -eq $best -or $v -gt $best.Version) {
+            $best = @{ Version = $v; Url = "$($asset.browser_download_url)"; Bytes = [long]$asset.size }
+        }
+    }
+    return $best
+}
 
 $Work = Join-Path $env:LOCALAPPDATA 'QSI-Offline-Installer'
 New-Item -ItemType Directory -Force -Path $Work | Out-Null
@@ -57,6 +79,17 @@ function Wait-BeforeClosing {
 # caret marker, CategoryInfo, FullyQualifiedErrorId) that repeats the message three times and
 # reads like a crash to a non-technical user.
 try {
+    Step 'Looking up the newest QSI Offline release'
+    $latest = Get-LatestRelease
+    if ($null -ne $latest) {
+        $Version  = "$($latest.Version)"
+        $ApkUrl   = $latest.Url
+        $ApkBytes = $latest.Bytes
+        Write-Host "    $Version"
+    } else {
+        Hint "GitHub could not be reached for the release list; using the built-in release $Version."
+    }
+
     Step 'Android platform tools (adb)'
     $adb = Join-Path $Work 'platform-tools\adb.exe'
     if (-not (Test-Path $adb)) {

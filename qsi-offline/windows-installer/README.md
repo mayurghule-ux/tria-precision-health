@@ -20,12 +20,12 @@ uninstalled first (its settings, chat history and any models it had downloaded a
 removed, so QSI Core and QSI Voice have to be downloaded again) and the new build is
 installed. No other app is ever removed.
 
-The installer installs exactly QSI Offline **1.0.9** (the `$Version` at the top of the
-`.ps1`). Every CI build publishes a newer release, and Android will not install an older
+The installer asks GitHub for the newest QSI Offline release and installs that one. If
+GitHub cannot be reached for the release list, it installs the release built into the
+`.ps1` (the `$Version` at the top, currently **1.0.9**). Android will not install an older
 build over a newer one, so if the device already has a newer QSI Offline the script stops
-with a message saying so and changes nothing. Get a newer copy of the installer, or, if
-that exact version is wanted, uninstall QSI Offline on the device first (that also
-deletes the models it downloaded).
+with a message saying so and changes nothing. In that case uninstall QSI Offline on the
+device first (that also deletes the models it downloaded), or wait for a newer release.
 
 If the script still shows no device after a minute, Windows may need a USB driver
 for the device (the script says so on screen): open Device Manager and look for the
