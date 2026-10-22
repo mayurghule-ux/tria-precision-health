@@ -12,7 +12,6 @@ kept here as a patch so the upstream code stays untouched and easy to update.
 | **QSI Nano** — lighter text chat using the AI built into recent phones, nothing to download | Google's on-device model through AICore / ML Kit GenAI; offered everywhere, the phone reports whether it has it |
 | **QSI Voice** — speech to text, language detected automatically | Whisper large-v3-turbo, 5-bit (whisper.cpp), MIT |
 | **QSI Image / QSI Image HD** — pictures from a text prompt | Stable Diffusion 1.5, Q4_0 / Q8_0 GGUF (stable-diffusion.cpp) |
-| **QSI Garden** — a game that shows the assistant calling functions | FunctionGemma 270M fine-tune (LiteRT-LM) |
 | **QSI Actions** — phone actions from a plain-language request | FunctionGemma 270M fine-tune by Jegly (LiteRT-LM) |
 | **Live Web** — an agent skill that searches the web and reads pages when the user asks for current information | Public web search, instant answers and encyclopedia extracts, fetched by the app's WebView; off whenever "Offline mode" is on |
 
@@ -31,6 +30,9 @@ request, downloads and Live Web included.
 - Every bundled agent skill that reaches the internet (Live Web, encyclopedia lookup,
   interactive map, send email) is refused with a plain message while "Offline mode" is on.
 - Speech recognition detects the language instead of forcing English.
+- Box's Tiny Garden game is left out: its only model file sits behind a Hugging Face
+  login (Gemma licence acknowledgement), and the app has no login. It can return once
+  QSI hosts that file itself; see "Hosting the models" below.
 - Native code is built for arm64 only (every current phone), which cuts build time and size.
 - About screen credits Box and Google AI Edge Gallery, as their Apache 2.0 licence requires.
 
@@ -42,6 +44,14 @@ and a charcoal dark theme with the same accents. Box's wallpaper-derived Materia
 colours are replaced by this fixed palette so the app looks the same on every phone.
 To adjust: `ui/theme/Color.kt` (palette), `ui/theme/Theme.kt` (gradients, card tints)
 and `res/drawable/ic_app_icon_{background,foreground}.xml` (icon), then regenerate the patch.
+
+## Hosting the models
+
+Every model downloads anonymously from huggingface.co, and CI refuses to build if one
+of the URLs in `MODEL_URLS` stops answering without a login (that is what removed the
+Garden game). The durable fix is to host the files under QSI's own domain or as GitHub
+release assets (2 GB limit per file) and point `MODEL_URLS` and `assets/model_allowlist.json`
+in the patch at them; the Gemma-derived files must carry Google's Gemma terms of use.
 
 ## Building
 

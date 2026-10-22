@@ -46,7 +46,7 @@ index b8be89f..d363c2e 100644
          android:supportsRtl="true"
          android:theme="@style/Theme.Gallery"
 diff --git a/Android/src/app/src/main/assets/model_allowlist.json b/Android/src/app/src/main/assets/model_allowlist.json
-index d186837..8528541 100644
+index d186837..c457477 100644
 --- a/Android/src/app/src/main/assets/model_allowlist.json
 +++ b/Android/src/app/src/main/assets/model_allowlist.json
 @@ -1,13 +1,13 @@
@@ -68,15 +68,13 @@ index d186837..8528541 100644
        "llmSupportImage": true,
        "llmSupportAudio": true,
        "llmSupportThinking": true,
-@@ -33,103 +33,40 @@
+@@ -33,126 +33,40 @@
          "llm_agent_chat",
          "llm_ask_image",
          "llm_ask_audio"
 -      ]
-+      ],
-+      "url": "https://huggingface.co/litert-community/gemma-4-E2B-it-litert-lm/resolve/7fa1d78473894f7e736a21d920c3aa80f950c0db/gemma-4-E2B-it.litertlm?download=true"
-     },
-     {
+-    },
+-    {
 -      "name": "Gemma-4-E4B-it",
 -      "modelId": "litert-community/gemma-4-E4B-it-litert-lm",
 -      "modelFile": "gemma-4-E4B-it.litertlm",
@@ -87,6 +85,39 @@ index d186837..8528541 100644
 -      "llmSupportImage": true,
 -      "llmSupportAudio": true,
 -      "llmSupportThinking": true,
+-      "defaultConfig": {
+-        "topK": 64,
+-        "topP": 0.95,
+-        "temperature": 1.0,
+-        "maxContextLength": 32000,
+-        "maxTokens": 4000,
+-        "accelerators": "gpu,npu,cpu",
+-        "visionAccelerator": "gpu"
+-      },
+-      "taskTypes": [
+-        "llm_chat",
+-        "llm_prompt_lab",
+-        "llm_agent_chat",
+-        "llm_ask_image",
+-        "llm_ask_audio"
+       ],
+-      "bestForTaskTypes": [
+-        "llm_chat",
+-        "llm_prompt_lab",
+-        "llm_agent_chat",
+-        "llm_ask_image",
+-        "llm_ask_audio"
+-      ]
++      "url": "https://huggingface.co/litert-community/gemma-4-E2B-it-litert-lm/resolve/7fa1d78473894f7e736a21d920c3aa80f950c0db/gemma-4-E2B-it.litertlm?download=true"
+     },
+     {
+-      "name": "Gemma3-1B-IT",
+-      "modelId": "litert-community/Gemma3-1B-IT",
+-      "modelFile": "gemma3-1b-it-int4.litertlm",
+-      "description": "A variant of [google/Gemma-3-1B-IT](https://huggingface.co/google/Gemma-3-1B-IT) with 4-bit quantization ready for deployment on Android using [LiteRT-LM](https://github.com/google-ai-edge/LiteRT-LM/blob/main/kotlin/README.md).",
+-      "sizeInBytes": 584417280,
+-      "minDeviceMemoryInGb": 6,
+-      "commitHash": "42d538a932e8d5b12e6b3b455f5572560bd60b2c",
 +      "name": "QSI Nano",
 +      "modelId": "qsi/qsi-nano",
 +      "modelFile": "qsi-nano",
@@ -97,43 +128,6 @@ index d186837..8528541 100644
 +      "description": "Uses the AI built into recent phones (for example current Pixel and Galaxy models) with nothing to download inside the app. Lighter and quicker than QSI Core; text only. If your phone does not have it, the button says so.",
 +      "sizeInBytes": 0,
        "defaultConfig": {
--        "topK": 64,
-+        "topK": 40,
-         "topP": 0.95,
--        "temperature": 1.0,
--        "maxContextLength": 32000,
--        "maxTokens": 4000,
--        "accelerators": "gpu,npu,cpu",
--        "visionAccelerator": "gpu"
-+        "temperature": 0.9,
-+        "maxTokens": 1024,
-+        "accelerators": "cpu"
-       },
-       "taskTypes": [
-         "llm_chat",
--        "llm_prompt_lab",
--        "llm_agent_chat",
--        "llm_ask_image",
--        "llm_ask_audio"
--      ],
--      "bestForTaskTypes": [
--        "llm_chat",
--        "llm_prompt_lab",
--        "llm_agent_chat",
--        "llm_ask_image",
--        "llm_ask_audio"
-+        "llm_prompt_lab"
-       ]
-     },
-     {
--      "name": "Gemma3-1B-IT",
--      "modelId": "litert-community/Gemma3-1B-IT",
--      "modelFile": "gemma3-1b-it-int4.litertlm",
--      "description": "A variant of [google/Gemma-3-1B-IT](https://huggingface.co/google/Gemma-3-1B-IT) with 4-bit quantization ready for deployment on Android using [LiteRT-LM](https://github.com/google-ai-edge/LiteRT-LM/blob/main/kotlin/README.md).",
--      "sizeInBytes": 584417280,
--      "minDeviceMemoryInGb": 6,
--      "commitHash": "42d538a932e8d5b12e6b3b455f5572560bd60b2c",
--      "defaultConfig": {
 -        "topK": 64,
 -        "topP": 0.95,
 -        "temperature": 1.0,
@@ -182,19 +176,25 @@ index d186837..8528541 100644
 -      "modelId": "litert-community/functiongemma-270m-ft-tiny-garden",
 -      "modelFile": "tiny_garden_q8_ekv1024.litertlm",
 -      "description": "Fine-tuned Function Gemma 270M model for Tiny Garden.",
-+      "name": "QSI Garden",
-+      "modelId": "qsi/qsi-garden",
-+      "modelFile": "qsi-garden.litertlm",
-+      "url": "https://huggingface.co/litert-community/functiongemma-270m-ft-tiny-garden/resolve/c205853ff82da86141a1105faa2344a8b176dfe7/tiny_garden_q8_ekv1024.litertlm?download=true",
-+      "description": "The small QSI engine behind the Garden game. Runs on any phone.",
-       "sizeInBytes": 288964608,
-       "minDeviceMemoryInGb": 4,
+-      "sizeInBytes": 288964608,
+-      "minDeviceMemoryInGb": 4,
 -      "commitHash": "c205853ff82da86141a1105faa2344a8b176dfe7",
-+      "commitHash": "1",
-       "defaultConfig": {
-         "topK": 64,
+-      "defaultConfig": {
+-        "topK": 64,
++        "topK": 40,
          "topP": 0.95,
-@@ -145,14 +82,14 @@
+-        "temperature": 0.0,
++        "temperature": 0.9,
+         "maxTokens": 1024,
+         "accelerators": "cpu"
+       },
+       "taskTypes": [
+-        "llm_tiny_garden"
+-      ],
+-      "bestForTaskTypes": [
+-        "llm_tiny_garden"
++        "llm_chat",
++        "llm_prompt_lab"
        ]
      },
      {
@@ -1313,10 +1313,10 @@ index 1e45e29..e79639d 100644
      Box() {
        LazyColumn(
 diff --git a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/modelmanager/ModelManagerViewModel.kt b/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/modelmanager/ModelManagerViewModel.kt
-index 07b6303..7d32f53 100644
+index 07b6303..132bbe3 100644
 --- a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/modelmanager/ModelManagerViewModel.kt
 +++ b/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/modelmanager/ModelManagerViewModel.kt
-@@ -78,6 +78,23 @@ import net.openid.appauth.ResponseTypeValues
+@@ -78,6 +78,22 @@ import net.openid.appauth.ResponseTypeValues
  
  private const val TAG = "AGModelManagerViewModel"
  private const val TEXT_INPUT_HISTORY_MAX_SIZE = 50
@@ -1333,14 +1333,13 @@ index 07b6303..7d32f53 100644
 +    BuiltInTaskId.LLM_AGENT_CHAT,
 +    BuiltInTaskId.WHISPER,
 +    BuiltInTaskId.IMAGE_GEN,
-+    BuiltInTaskId.LLM_TINY_GARDEN,
 +    BuiltInTaskId.LLM_MOBILE_ACTIONS,
 +  )
 +
  private const val MODEL_ALLOWLIST_FILENAME = "model_allowlist.json"
  private const val MODEL_ALLOWLIST_TEST_FILENAME = "model_allowlist_test.json"
  private const val ALLOWLIST_BASE_URL =
-@@ -219,7 +236,7 @@ constructor(
+@@ -219,7 +235,7 @@ constructor(
    }
  
    fun getActiveCustomTasks(): List<CustomTask> {

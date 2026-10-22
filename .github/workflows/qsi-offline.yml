@@ -94,7 +94,7 @@ jobs:
           models = json.load(sys.stdin)["models"]
           names = [m["name"] for m in models]
           print("allowlisted models:", names)
-          assert names == ["QSI Core", "QSI Nano", "QSI Garden", "QSI Actions"], names
+          assert names == ["QSI Core", "QSI Nano", "QSI Actions"], names
           '
 
           # Upstream display names that must not reach the UI. Grep a file rather
