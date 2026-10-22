@@ -14,19 +14,22 @@ kept here as a patch so the upstream code stays untouched and easy to update.
 | **QSI Image / QSI Image HD** — pictures from a text prompt | Stable Diffusion 1.5, Q4_0 / Q8_0 GGUF (stable-diffusion.cpp) |
 | **QSI Garden** — a game that shows the assistant calling functions | FunctionGemma 270M fine-tune (LiteRT-LM) |
 | **QSI Actions** — phone actions from a plain-language request | FunctionGemma 270M fine-tune by Jegly (LiteRT-LM) |
+| **Live Web** — an agent skill that searches the web and reads pages when the user asks for current information | Public web search, instant answers and encyclopedia extracts, fetched by the app's WebView; off whenever "Offline mode" is on |
 
-Model names never appear in the app. Both models are downloaded once from inside the
-app, then everything runs offline. Nothing typed, spoken or photographed leaves the
-phone, and chat history is stored encrypted behind a biometric lock (both from Box).
+Model names never appear in the app. Models are downloaded once from inside the app,
+then everything runs offline. Nothing typed, spoken or photographed leaves the phone
+unless the user asks the agent to go online, and chat history is stored encrypted behind
+a biometric lock (both from Box). The Settings toggle "Offline mode" blocks every network
+request, downloads and Live Web included.
 
 ## What the patch changes
 
 - Name, launcher icon, splash and accent colour → QSI Offline; application id
   `in.quantumsi.offline`, so it installs alongside Box rather than over it.
-- The model list is reduced to QSI Core and QSI Voice, with neutral local file names and
-  no links to upstream model pages.
-- Model import is removed, and so are the features that need other models (image
-  generation, the demo games, the example task).
+- The model list is the fixed set above, with neutral local file names and no links to
+  upstream model pages. Model import is removed, and so is the example task.
+- Every bundled agent skill that reaches the internet (Live Web, encyclopedia lookup,
+  interactive map, send email) is refused with a plain message while "Offline mode" is on.
 - Speech recognition detects the language instead of forcing English.
 - Native code is built for arm64 only (every current phone), which cuts build time and size.
 - About screen credits Box and Google AI Edge Gallery, as their Apache 2.0 licence requires.

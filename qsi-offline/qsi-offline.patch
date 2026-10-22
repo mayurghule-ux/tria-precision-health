@@ -252,10 +252,10 @@ index 0000000..75f5606
 +- If the tool reports that online access is off, tell the user it can be turned on in Settings.
 diff --git a/Android/src/app/src/main/assets/skills/live-web/scripts/index.html b/Android/src/app/src/main/assets/skills/live-web/scripts/index.html
 new file mode 100644
-index 0000000..e4476d1
+index 0000000..66cd6fc
 --- /dev/null
 +++ b/Android/src/app/src/main/assets/skills/live-web/scripts/index.html
-@@ -0,0 +1,126 @@
+@@ -0,0 +1,127 @@
 +<!doctype html>
 +<html lang="en">
 +  <head>
@@ -332,7 +332,7 @@ index 0000000..e4476d1
 +
 +      async function webResults(query) {
 +        const text = await readUrl(`https://html.duckduckgo.com/html/?q=${encodeURIComponent(query)}`);
-+        return text.slice(0, 3000);
++        return text.slice(0, 2500);
 +      }
 +
 +      function cap(s, n) {
@@ -361,9 +361,10 @@ index 0000000..e4476d1
 +          const take = (r, title) => {
 +            if (r.status === "fulfilled" && r.value && r.value.trim()) parts.push(`## ${title}\n${r.value.trim()}`);
 +          };
-+          take(web, "Web results");
++          // Short, high-signal sources first so the cap below trims the long web listing, not them.
 +          take(instant, "Quick answer");
 +          take(wiki, "Encyclopedia");
++          take(web, "Web results");
 +          if (!parts.length) {
 +            const why = [web, instant, wiki]
 +              .filter((r) => r.status === "rejected")
