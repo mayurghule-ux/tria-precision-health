@@ -252,10 +252,10 @@ index 0000000..75f5606
 +- If the tool reports that online access is off, tell the user it can be turned on in Settings.
 diff --git a/Android/src/app/src/main/assets/skills/live-web/scripts/index.html b/Android/src/app/src/main/assets/skills/live-web/scripts/index.html
 new file mode 100644
-index 0000000..66cd6fc
+index 0000000..623b599
 --- /dev/null
 +++ b/Android/src/app/src/main/assets/skills/live-web/scripts/index.html
-@@ -0,0 +1,127 @@
+@@ -0,0 +1,126 @@
 +<!doctype html>
 +<html lang="en">
 +  <head>
@@ -372,9 +372,8 @@ index 0000000..66cd6fc
 +              .join("; ");
 +            return JSON.stringify({ error: "Nothing came back from the live web (" + why + "). Check the connection and try again." });
 +          }
-+          return JSON.stringify({
-+            result: cap(parts.join("\n\n"), RESULT_CAP) + "\n\nSearched live on " + new Date().toUTCString(),
-+          });
++          const stamp = "\n\nSearched live on " + new Date().toUTCString();
++          return JSON.stringify({ result: cap(parts.join("\n\n"), RESULT_CAP - stamp.length) + stamp });
 +        } catch (e) {
 +          console.error(e);
 +          return JSON.stringify({ error: "Live Web failed: " + e.message });
@@ -450,7 +449,7 @@ index ee8b9b3..fb215d2 100644
        defaultSystemPrompt =
          """
 diff --git a/Android/src/app/src/main/java/com/google/ai/edge/gallery/customtasks/agentchat/AgentTools.kt b/Android/src/app/src/main/java/com/google/ai/edge/gallery/customtasks/agentchat/AgentTools.kt
-index c9bd3d2..5fc44e3 100644
+index c9bd3d2..fe2ff49 100644
 --- a/Android/src/app/src/main/java/com/google/ai/edge/gallery/customtasks/agentchat/AgentTools.kt
 +++ b/Android/src/app/src/main/java/com/google/ai/edge/gallery/customtasks/agentchat/AgentTools.kt
 @@ -27,6 +27,7 @@ import com.google.ai.edge.gallery.common.LOCAL_URL_BASE
@@ -490,6 +489,29 @@ index c9bd3d2..5fc44e3 100644
        // Check secret. If a skill requires a secret and the secret is not provided, show error.
        var secret = ""
        if (skill.requireSecret) {
+@@ -182,17 +198,17 @@ class AgentTools() : ToolSet {
+       val resultJson = runCatching { jsonAdapter.fromJson(result) }.getOrNull()
+       val error = resultJson?.error
+ 
++      // Error case: a payload that only carries "error" is a failure, not a result string.
++      if (error != null) {
++        mapOf("error" to error, "status" to "failed")
++      }
+       // Failed to parse. Treat its whole as a result string.
+-      if (
++      else if (
+         resultJson == null ||
+           (resultJson.result == null && resultJson.webview == null && resultJson.image == null)
+       ) {
+         mapOf("result" to result, "status" to "succeeded")
+       }
+-      // Error case.
+-      else if (error != null) {
+-        mapOf("error" to error, "status" to "failed")
+-      }
+       // Non-error cases.
+       else {
+         // Handle image and webview in result.
 diff --git a/Android/src/app/src/main/java/com/google/ai/edge/gallery/customtasks/agentchat/SkillManagerViewModel.kt b/Android/src/app/src/main/java/com/google/ai/edge/gallery/customtasks/agentchat/SkillManagerViewModel.kt
 index 1b26b5c..5cdb027 100644
 --- a/Android/src/app/src/main/java/com/google/ai/edge/gallery/customtasks/agentchat/SkillManagerViewModel.kt
