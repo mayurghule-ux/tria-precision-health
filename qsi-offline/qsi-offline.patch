@@ -224,6 +224,164 @@ index 678892b..c9ed5f6 100644
  - "Hash 'password123' with SHA-1"
 -- "What is the hash of 'gemma'?" → use SHA-256 by default
 +- "What is the hash of 'hello'?" → use SHA-256 by default
+diff --git a/Android/src/app/src/main/assets/skills/live-web/SKILL.md b/Android/src/app/src/main/assets/skills/live-web/SKILL.md
+new file mode 100644
+index 0000000..75f5606
+--- /dev/null
++++ b/Android/src/app/src/main/assets/skills/live-web/SKILL.md
+@@ -0,0 +1,20 @@
++---
++name: live-web
++description: Search the live web for current information (news, prices, events, anything recent) and read a web page by its address. Needs online access to be allowed in Settings.
++---
++
++# Live Web
++
++## Instructions
++
++Call the `run_js` tool using `index.html` and a JSON string for `data` with these fields:
++- **mode**: Optional. `"search"` (default) to search the web, or `"read"` to read one page.
++- **query**: Required for search. A short search-engine query of 2 to 8 words holding the key names, places and dates. Remove conversational words. Add the year for anything time-sensitive.
++- **url**: Required for read. The full `http(s)://` address of the page to read, for example a link returned by a search.
++- **lang**: Optional. The 2-letter language code of the query, default `"en"`.
++
++**Constraints:**
++- Search first. If a result is relevant but its snippet is too short, read its URL with `mode: "read"`.
++- Answer in the user's language, in a few sentences, and name the page titles or addresses you relied on.
++- Say plainly when the results are thin, dated, or contradictory. Never present search text as your own knowledge.
++- If the tool reports that online access is off, tell the user it can be turned on in Settings.
+diff --git a/Android/src/app/src/main/assets/skills/live-web/scripts/index.html b/Android/src/app/src/main/assets/skills/live-web/scripts/index.html
+new file mode 100644
+index 0000000..e4476d1
+--- /dev/null
++++ b/Android/src/app/src/main/assets/skills/live-web/scripts/index.html
+@@ -0,0 +1,126 @@
++<!doctype html>
++<html lang="en">
++  <head>
++    <meta charset="UTF-8" />
++    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
++    <title>Live Web</title>
++  </head>
++  <body>
++    <script>
++      // Live Web for QSI Offline. Runs inside the app's WebView, so every request is an
++      // ordinary browser request and must be allowed cross-origin by the service:
++      //  - Wikipedia's API allows it (origin=*).
++      //  - Instant answers are fetched as JSONP, which needs no cross-origin permission.
++      //  - Web results and page reading go through a public page reader that returns the
++      //    page as plain text and allows browser requests.
++      // Each source is optional: whatever answers in time is combined.
++      const RESULT_CAP = 4500;
++
++      function withTimeout(promise, ms, label) {
++        return Promise.race([
++          promise,
++          new Promise((_, reject) => setTimeout(() => reject(new Error(label + " timed out")), ms)),
++        ]);
++      }
++
++      async function wikipedia(query, lang) {
++        const base = `https://${lang}.wikipedia.org/w/api.php`;
++        const params = new URLSearchParams({
++          action: "query", format: "json", generator: "search", gsrsearch: query, gsrlimit: "3",
++          prop: "extracts", explaintext: "1", exintro: "1", exchars: "600", origin: "*",
++        });
++        const res = await fetch(`${base}?${params.toString()}`);
++        if (!res.ok) throw new Error("HTTP " + res.status);
++        const data = await res.json();
++        const pages = data.query && data.query.pages ? Object.values(data.query.pages) : [];
++        pages.sort((a, b) => (a.index || 0) - (b.index || 0));
++        return pages
++          .map((p) => {
++            const text = (p.extract || "").replace(/\s+/g, " ").trim();
++            const link = `https://${lang}.wikipedia.org/wiki/${encodeURIComponent(p.title.replace(/ /g, "_"))}`;
++            return `• ${p.title} — ${text}\n  ${link}`;
++          })
++          .join("\n");
++      }
++
++      function instantAnswers(query) {
++        return new Promise((resolve, reject) => {
++          const cb = "qsi_live_cb_" + Date.now();
++          const script = document.createElement("script");
++          const done = (fn) => (v) => { delete window[cb]; script.remove(); fn(v); };
++          window[cb] = done(resolve);
++          script.onerror = done(() => reject(new Error("instant answers unavailable")));
++          script.src =
++            `https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&no_html=1&skip_disambig=1&callback=${cb}`;
++          document.body.appendChild(script);
++        }).then((d) => {
++          const lines = [];
++          if (d.AbstractText) lines.push(`${d.Heading || query}: ${d.AbstractText}\n  ${d.AbstractURL || ""}`);
++          const topics = (d.RelatedTopics || [])
++            .flatMap((t) => (t.Topics ? t.Topics : [t]))
++            .filter((t) => t.Text && t.FirstURL)
++            .slice(0, 5);
++          for (const t of topics) lines.push(`• ${t.Text}\n  ${t.FirstURL}`);
++          return lines.join("\n");
++        });
++      }
++
++      async function readUrl(url) {
++        const res = await fetch("https://r.jina.ai/" + url);
++        if (!res.ok) throw new Error("HTTP " + res.status);
++        const text = await res.text();
++        return text.replace(/\n{3,}/g, "\n\n").trim();
++      }
++
++      async function webResults(query) {
++        const text = await readUrl(`https://html.duckduckgo.com/html/?q=${encodeURIComponent(query)}`);
++        return text.slice(0, 3000);
++      }
++
++      function cap(s, n) {
++        return s.length > n ? s.slice(0, n) + "\n\n... [truncated to save context]" : s;
++      }
++
++      window["ai_edge_gallery_get_result"] = async (data) => {
++        try {
++          const d = JSON.parse(data || "{}");
++          if (navigator.onLine === false) {
++            return JSON.stringify({ error: "No internet connection. Live Web needs the phone to be online." });
++          }
++          const lang = (d.lang || "en").toLowerCase().slice(0, 2);
++          if (d.mode === "read") {
++            if (!d.url || !/^https?:\/\//i.test(d.url)) return JSON.stringify({ error: "A full http(s) address is needed to read a page." });
++            const text = await withTimeout(readUrl(d.url), 25000, "Reading the page");
++            return JSON.stringify({ result: cap(text, 6000) });
++          }
++          if (!d.query) return JSON.stringify({ error: "No query given." });
++          const [web, instant, wiki] = await Promise.allSettled([
++            withTimeout(webResults(d.query), 20000, "Web results"),
++            withTimeout(instantAnswers(d.query), 12000, "Quick answer"),
++            withTimeout(wikipedia(d.query, lang), 12000, "Encyclopedia"),
++          ]);
++          const parts = [];
++          const take = (r, title) => {
++            if (r.status === "fulfilled" && r.value && r.value.trim()) parts.push(`## ${title}\n${r.value.trim()}`);
++          };
++          take(web, "Web results");
++          take(instant, "Quick answer");
++          take(wiki, "Encyclopedia");
++          if (!parts.length) {
++            const why = [web, instant, wiki]
++              .filter((r) => r.status === "rejected")
++              .map((r) => (r.reason && r.reason.message) || "failed")
++              .join("; ");
++            return JSON.stringify({ error: "Nothing came back from the live web (" + why + "). Check the connection and try again." });
++          }
++          return JSON.stringify({
++            result: cap(parts.join("\n\n"), RESULT_CAP) + "\n\nSearched live on " + new Date().toUTCString(),
++          });
++        } catch (e) {
++          console.error(e);
++          return JSON.stringify({ error: "Live Web failed: " + e.message });
++        }
++      };
++    </script>
++  </body>
++</html>
 diff --git a/Android/src/app/src/main/java/com/box/gallery/MainActivity.kt b/Android/src/app/src/main/java/com/box/gallery/MainActivity.kt
 index 2678b8a..37ba48e 100644
 --- a/Android/src/app/src/main/java/com/box/gallery/MainActivity.kt
@@ -290,11 +448,69 @@ index ee8b9b3..fb215d2 100644
        textInputPlaceHolderRes = R.string.text_input_placeholder_llm_chat,
        defaultSystemPrompt =
          """
+diff --git a/Android/src/app/src/main/java/com/google/ai/edge/gallery/customtasks/agentchat/AgentTools.kt b/Android/src/app/src/main/java/com/google/ai/edge/gallery/customtasks/agentchat/AgentTools.kt
+index c9bd3d2..5fc44e3 100644
+--- a/Android/src/app/src/main/java/com/google/ai/edge/gallery/customtasks/agentchat/AgentTools.kt
++++ b/Android/src/app/src/main/java/com/google/ai/edge/gallery/customtasks/agentchat/AgentTools.kt
+@@ -27,6 +27,7 @@ import com.google.ai.edge.gallery.common.LOCAL_URL_BASE
+ import com.google.ai.edge.gallery.common.SkillProgressAgentAction
+ import com.google.ai.edge.litertlm.Tool
+ import com.google.ai.edge.litertlm.ToolParam
++import com.google.ai.edge.gallery.security.OfflineMode
+ import com.google.ai.edge.litertlm.ToolSet
+ import com.squareup.moshi.JsonAdapter
+ import com.squareup.moshi.Moshi
+@@ -37,6 +38,9 @@ import kotlinx.coroutines.runBlocking
+ 
+ private const val TAG = "AGAgentTools"
+ 
++/** QSI Offline: skills that reach the internet, refused while the app is set to offline-only. */
++private val NETWORK_SKILLS = setOf("live-web", "query-wikipedia", "interactive-map", "send-email")
++
+ class AgentTools() : ToolSet {
+   lateinit var context: Context
+   lateinit var skillManagerViewModel: SkillManagerViewModel
+@@ -118,6 +122,18 @@ class AgentTools() : ToolSet {
+         )
+       }
+ 
++      if (skill.name in NETWORK_SKILLS && OfflineMode.isEnabled.value) {
++        _actionChannel.send(
++          SkillProgressAgentAction(label = "\"${skill.name}\" needs online access", inProgress = false)
++        )
++        return@runBlocking mapOf(
++          "error" to
++            "\"${skill.name}\" needs the internet, and QSI Offline is set to offline-only. " +
++              "Turn off \"Offline mode\" in Settings to allow it.",
++          "status" to "failed",
++        )
++      }
++
+       // Check secret. If a skill requires a secret and the secret is not provided, show error.
+       var secret = ""
+       if (skill.requireSecret) {
 diff --git a/Android/src/app/src/main/java/com/google/ai/edge/gallery/customtasks/agentchat/SkillManagerViewModel.kt b/Android/src/app/src/main/java/com/google/ai/edge/gallery/customtasks/agentchat/SkillManagerViewModel.kt
-index 1b26b5c..c805179 100644
+index 1b26b5c..5cdb027 100644
 --- a/Android/src/app/src/main/java/com/google/ai/edge/gallery/customtasks/agentchat/SkillManagerViewModel.kt
 +++ b/Android/src/app/src/main/java/com/google/ai/edge/gallery/customtasks/agentchat/SkillManagerViewModel.kt
-@@ -67,7 +67,7 @@ val TRYOUT_CHIPS: List<SkillTryOutChip> =
+@@ -27,6 +27,7 @@ import androidx.compose.material.icons.outlined.Email
+ import androidx.compose.material.icons.outlined.Savings
+ import androidx.compose.material.icons.outlined.LocalLibrary
+ import androidx.compose.material.icons.outlined.Map
++import androidx.compose.material.icons.outlined.Public
+ import androidx.compose.material.icons.outlined.Password
+ import androidx.compose.material.icons.outlined.QrCode
+ import androidx.compose.material.icons.outlined.SentimentVerySatisfied
+@@ -64,10 +65,16 @@ private const val SKILL_ALLOWLIST_URL = ""
+ 
+ val TRYOUT_CHIPS: List<SkillTryOutChip> =
+   listOf(
++    SkillTryOutChip(
++      icon = Icons.Outlined.Public,
++      label = "Live Web",
++      prompt = "Search the live web: what is in the news in India today?",
++      skillName = "live-web",
++    ),
      SkillTryOutChip(
        icon = Icons.Outlined.Map,
        label = "Interactive Map",
@@ -303,7 +519,7 @@ index 1b26b5c..c805179 100644
        skillName = "interactive-map",
      ),
      SkillTryOutChip(
-@@ -79,7 +79,7 @@ val TRYOUT_CHIPS: List<SkillTryOutChip> =
+@@ -79,7 +86,7 @@ val TRYOUT_CHIPS: List<SkillTryOutChip> =
      SkillTryOutChip(
        icon = Icons.Outlined.Tag,
        label = "Calculate Hash",
@@ -312,7 +528,7 @@ index 1b26b5c..c805179 100644
        skillName = "calculate-hash",
      ),
      SkillTryOutChip(
-@@ -116,7 +116,7 @@ val TRYOUT_CHIPS: List<SkillTryOutChip> =
+@@ -116,7 +123,7 @@ val TRYOUT_CHIPS: List<SkillTryOutChip> =
      SkillTryOutChip(
        icon = Icons.Outlined.QrCode,
        label = "Generate QR code",
@@ -621,7 +837,7 @@ index e2d37bd..9058d24 100644
    Text(
      introText,
 diff --git a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/home/SettingsDialog.kt b/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/home/SettingsDialog.kt
-index b1ba64d..771e70a 100644
+index b1ba64d..5301034 100644
 --- a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/home/SettingsDialog.kt
 +++ b/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/home/SettingsDialog.kt
 @@ -197,109 +197,7 @@ fun SettingsDialog(
@@ -735,6 +951,15 @@ index b1ba64d..771e70a 100644
  
            // Box: Biometric lock toggle
            val dbEncEnabled by BiometricEncryptionManager.isEnabledFlow.collectAsState()
+@@ -380,7 +278,7 @@ fun SettingsDialog(
+               style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Medium),
+             )
+             Text(
+-              "Block all network requests. Models must be pre-downloaded.",
++              "On: every network request is blocked, including Live Web searches, so models must already be downloaded. Off: downloads and Live Web searches are allowed.",
+               style = MaterialTheme.typography.bodySmall,
+               color = MaterialTheme.colorScheme.onSurfaceVariant,
+             )
 @@ -410,10 +308,10 @@ fun SettingsDialog(
                style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Medium),
              )
