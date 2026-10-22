@@ -1,6 +1,2 @@
-https://huggingface.co/adiagarwal/nanochat-models/resolve/main/TinyGarden-270M/tiny_garden_q8_ekv1024.litertlm?download=true
+https://huggingface.co/api/models/adiagarwal/nanochat-models/tree/main
 https://huggingface.co/api/models/adiagarwal/nanochat-models?blobs=true
-https://huggingface.co/api/models/litert-community/functiongemma-270m-ft-tiny-garden
-https://huggingface.co/api/models/litert-community/gemma-4-E2B-it-litert-lm
-https://huggingface.co/api/models?search=tiny_garden&limit=50
-https://huggingface.co/api/models?search=litertlm&author=jegly&limit=50

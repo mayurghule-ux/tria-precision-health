@@ -17,6 +17,12 @@ jobs:
           while read -r url; do
             [ -n "$url" ] || continue
             code=$(curl -sIL -o /dev/null -m 60 -w '%{http_code}' "$url")
-            body=$(curl -sL -m 60 --range 0-3000 "$url" | tr -d '\r' | tr '\n%' '  ' | cut -c1-3000)
-            echo "::notice::HTTP $code $url :: $body"
+            body=$(curl -sL -m 120 --range 0-24000 "$url" | tr -d '\r' | tr '\n%' '  ')
+            echo "::notice::HTTP $code $url :: ${body:0:2800}"
+            # Annotation messages are capped, so long bodies continue in numbered parts.
+            for i in 1 2 3 4 5 6 7 8; do
+              part="${body:$((i*2800)):2800}"
+              [ -n "$part" ] || break
+              echo "::notice::PART $i $url :: $part"
+            done
           done < qsi-offline/PROBE_URLS
