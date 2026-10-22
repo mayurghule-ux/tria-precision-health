@@ -863,10 +863,58 @@ index e210cca..cdcadad 100644
                  withContext(Dispatchers.Main) {
                      if (saved) Toast.makeText(context, "Saved to Downloads/$fileName", Toast.LENGTH_LONG).show()
 diff --git a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/home/HomeScreen.kt b/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/home/HomeScreen.kt
-index e2d37bd..b60e788 100644
+index e2d37bd..0781486 100644
 --- a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/home/HomeScreen.kt
 +++ b/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/home/HomeScreen.kt
-@@ -340,7 +340,7 @@ fun HomeScreen(
+@@ -67,6 +67,7 @@ import androidx.compose.material.icons.rounded.FolderOpen
+ import androidx.compose.material.icons.rounded.Settings
+ import androidx.compose.material3.AlertDialog
+ import androidx.compose.material3.Card
++import androidx.compose.foundation.BorderStroke
+ import androidx.compose.material3.CardDefaults
+ import androidx.compose.material3.CircularProgressIndicator
+ import androidx.compose.material3.DrawerValue
+@@ -96,6 +97,7 @@ import androidx.compose.ui.draw.BlurredEdgeTreatment
+ import androidx.compose.ui.draw.blur
+ import androidx.compose.ui.draw.clip
+ import androidx.compose.ui.graphics.Brush
++import androidx.compose.ui.graphics.SolidColor
+ import androidx.compose.ui.graphics.Brush.Companion.linearGradient
+ import androidx.compose.ui.graphics.Color
+ import androidx.compose.ui.graphics.ColorFilter
+@@ -302,14 +304,7 @@ fun HomeScreen(
+                     scope.launch { drawerState.close() }
+                   },
+                   modifier = Modifier.weight(1f),
+-                  iconBrush =
+-                    linearGradient(
+-                      colors =
+-                        listOf(
+-                          MaterialTheme.customColors.taskBgGradientColors[2][0],
+-                          MaterialTheme.customColors.taskBgGradientColors[2][1],
+-                        )
+-                    ),
++                  iconBrush = SolidColor(MaterialTheme.customColors.taskIconColors[2]),
+                 )
+                 Spacer(modifier = Modifier.width(16.dp))
+                 SquareDrawerItem(
+@@ -324,14 +319,7 @@ fun HomeScreen(
+                     }
+                   },
+                   modifier = Modifier.weight(1f),
+-                  iconBrush =
+-                    linearGradient(
+-                      colors =
+-                        listOf(
+-                          MaterialTheme.customColors.taskBgGradientColors[1][0],
+-                          MaterialTheme.customColors.taskBgGradientColors[1][1],
+-                        )
+-                    ),
++                  iconBrush = SolidColor(MaterialTheme.customColors.taskIconColors[1]),
+                 )
+               }
+             }
+@@ -340,7 +328,7 @@ fun HomeScreen(
          gesturesEnabled = drawerState.isOpen,
        ) {
          Scaffold(
@@ -875,7 +923,7 @@ index e2d37bd..b60e788 100644
            topBar = {
              // Top bar animation:
              //
-@@ -381,9 +381,9 @@ fun HomeScreen(
+@@ -381,9 +369,9 @@ fun HomeScreen(
                  .background(
                    Brush.radialGradient(
                      colors = listOf(
@@ -888,7 +936,7 @@ index e2d37bd..b60e788 100644
                      ),
                      radius = 2000f
                    )
-@@ -397,9 +397,9 @@ fun HomeScreen(
+@@ -397,9 +385,9 @@ fun HomeScreen(
                    .background(
                      Brush.radialGradient(
                        colors = listOf(
@@ -901,7 +949,7 @@ index e2d37bd..b60e788 100644
                        ),
                        radius = 2000f
                      )
-@@ -493,26 +493,7 @@ fun HomeScreen(
+@@ -493,26 +481,7 @@ fun HomeScreen(
                      Spacer(modifier = Modifier.width(4.dp))
                      Text("History", maxLines = 1)
                    }
@@ -929,7 +977,7 @@ index e2d37bd..b60e788 100644
                  }
  
                  // Tab header for categories.
-@@ -702,7 +683,7 @@ private fun IntroText(enableAnimation: Boolean, gm4: Boolean) {
+@@ -702,7 +671,7 @@ private fun IntroText(enableAnimation: Boolean, gm4: Boolean) {
      }
  
    val introText = buildAnnotatedString {
@@ -938,6 +986,22 @@ index e2d37bd..b60e788 100644
    }
    Text(
      introText,
+@@ -966,11 +935,14 @@ private fun TaskCard(
+         .clickable(onClick = onClick)
+         .graphicsLayer { alpha = progress }
+         .semantics { contentDescription = cbTask },
++    // The home backdrop is now the theme background, so the card needs its own edge.
++    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
++    elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+     colors =
+       CardDefaults.cardColors(
+         containerColor =
+           if (description.isNotEmpty() || square) {
+-            MaterialTheme.colorScheme.surfaceContainer
++            MaterialTheme.colorScheme.surfaceContainerHighest
+           } else {
+ 
+             MaterialTheme.customColors.taskCardBgColor
 diff --git a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/home/SettingsDialog.kt b/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/home/SettingsDialog.kt
 index b1ba64d..5301034 100644
 --- a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/home/SettingsDialog.kt
@@ -1968,14 +2032,22 @@ index d9e5203..c191f08 100644
 +    <path android:pathData="M54,54m-6.5,0a6.5,6.5 0 1,0 13,0a6.5,6.5 0 1,0 -13,0"><aapt:attr name="android:fillColor"><gradient android:type="linear" android:startX="24" android:startY="24" android:endX="84" android:endY="84"><item android:offset="0" android:color="#3B82F6"/><item android:offset="1" android:color="#7C3AED"/></gradient></aapt:attr></path>
  </vector>
 diff --git a/Android/src/app/src/main/res/values-night/themes.xml b/Android/src/app/src/main/res/values-night/themes.xml
-index 69b30fb..686cb0e 100644
+index 69b30fb..8f2836b 100644
 --- a/Android/src/app/src/main/res/values-night/themes.xml
 +++ b/Android/src/app/src/main/res/values-night/themes.xml
-@@ -19,7 +19,8 @@
+@@ -16,10 +16,15 @@
+ -->
+ 
+ <resources xmlns:tools="http://schemas.android.com/tools">
++  <style name="Theme.Gallery" parent="android:Theme.Material.NoActionBar">
++      <!-- Matches backgroundDark in Color.kt -->
++      <item name="android:windowBackground">#FF0F0F14</item>
++  </style>
    <style name="Theme.Gallery.SplashScreen" parent="Theme.SplashScreen">
      <!-- Need to match surfaceDark in Colors.kt -->
-     <item name="windowSplashScreenBackground">#FF131314</item>
+-    <item name="windowSplashScreenBackground">#FF131314</item>
 -    <item name="windowSplashScreenAnimatedIcon">@drawable/splash_screen_animated_icon</item>
++    <item name="windowSplashScreenBackground">#FF0F0F14</item>
 +    <item name="windowSplashScreenAnimatedIcon">@drawable/ic_app_icon_foreground</item>
 +    <item name="windowSplashScreenIconBackgroundColor">#FFFFFF</item>
      <item name="postSplashScreenTheme">@style/Theme.Gallery</item>
@@ -2050,11 +2122,18 @@ index dd16e90..dbd3711 100644
  Please exercise caution before providing sensitive information, such as personal identification, tokens, or API keys.
  
 diff --git a/Android/src/app/src/main/res/values/themes.xml b/Android/src/app/src/main/res/values/themes.xml
-index 2048f0d..e28c78f 100644
+index 2048f0d..cda8174 100644
 --- a/Android/src/app/src/main/res/values/themes.xml
 +++ b/Android/src/app/src/main/res/values/themes.xml
-@@ -19,7 +19,9 @@
-   <style name="Theme.Gallery" parent="android:Theme.Material.NoActionBar" />
+@@ -16,10 +16,15 @@
+ -->
+ 
+ <resources xmlns:tools="http://schemas.android.com/tools">
+-  <style name="Theme.Gallery" parent="android:Theme.Material.NoActionBar" />
++  <style name="Theme.Gallery" parent="android:Theme.Material.NoActionBar">
++      <!-- Matches backgroundLight in Color.kt -->
++      <item name="android:windowBackground">#FFFFFFFF</item>
++  </style>
    <style name="Theme.Gallery.SplashScreen" parent="Theme.SplashScreen">
        <!-- Black splash screen background -->
 -      <item name="windowSplashScreenBackground">#FF000000</item>
