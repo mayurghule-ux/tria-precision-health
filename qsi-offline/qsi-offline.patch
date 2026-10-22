@@ -530,7 +530,7 @@ index e2d37bd..9058d24 100644
    Text(
      introText,
 diff --git a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/home/SettingsDialog.kt b/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/home/SettingsDialog.kt
-index b1ba64d..8bc1b21 100644
+index b1ba64d..771e70a 100644
 --- a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/home/SettingsDialog.kt
 +++ b/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/home/SettingsDialog.kt
 @@ -197,109 +197,7 @@ fun SettingsDialog(
@@ -669,7 +669,7 @@ index b1ba64d..8bc1b21 100644
 -            )
 -            Text(
 -              "Box fork version: v1.0.1",
-+              "QSI Offline by Quantum SI",
++              "QSI Offline by Quantum Synthetic Intelligence Private Limited. Made in India.",
                style = MaterialTheme.typography.bodySmall,
                color = MaterialTheme.colorScheme.onSurfaceVariant,
              )
@@ -891,30 +891,77 @@ index 07b6303..ef828a4 100644
  
    fun getSelectedModel(): Model? {
 diff --git a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/theme/Color.kt b/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/theme/Color.kt
-index 2f99969..d69c74f 100644
+index 2f99969..7a9d8e2 100644
 --- a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/theme/Color.kt
 +++ b/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/theme/Color.kt
-@@ -18,10 +18,10 @@ package com.google.ai.edge.gallery.ui.theme
+@@ -18,74 +18,77 @@ package com.google.ai.edge.gallery.ui.theme
  
  import androidx.compose.ui.graphics.Color
  
 -val primaryLight = Color(0xFF0B57D0)
-+val primaryLight = Color(0xFF4F46E5) // QSI accent
++// QSI Offline brand palette, matched to quantumsi.in: a white page with a violet accent and
++// the blue-to-violet of the atom mark. Used as a fixed scheme in Theme.kt.
++
++val primaryLight = Color(0xFF6D28D9)
  val onPrimaryLight = Color(0xFFFFFFFF)
 -val primaryContainerLight = Color(0xFFD3E3FD)
 -val onPrimaryContainerLight = Color(0xFF0842A0)
-+val primaryContainerLight = Color(0xFFE0E7FF)
-+val onPrimaryContainerLight = Color(0xFF312E81)
- val secondaryLight = Color(0xFF00639B)
+-val secondaryLight = Color(0xFF00639B)
++val primaryContainerLight = Color(0xFFEDE9FE)
++val onPrimaryContainerLight = Color(0xFF2E1065)
++val secondaryLight = Color(0xFF2563EB)
  val onSecondaryLight = Color(0xFFFFFFFF)
- val secondaryContainerLight = Color(0xFFC2E7FF)
-@@ -49,15 +49,15 @@ val inverseSurfaceLight = Color(0xFF303030)
- val inverseOnSurfaceLight = Color(0xFFF2F2F2)
- val outlineLight = Color(0xFF747775)
- val outlineVariantLight = Color(0xFFC4C7C5)
+-val secondaryContainerLight = Color(0xFFC2E7FF)
+-val onSecondaryContainerLight = Color(0xFF004A77)
+-val tertiaryLight = Color(0xFF146C2E)
++val secondaryContainerLight = Color(0xFFDBEAFE)
++val onSecondaryContainerLight = Color(0xFF1E3A8A)
++val tertiaryLight = Color(0xFF0E7490)
+ val onTertiaryLight = Color(0xFFFFFFFF)
+-val tertiaryContainerLight = Color(0xFFC4EED0)
+-val onTertiaryContainerLight = Color(0xFF0F5223)
+-val errorLight = Color(0xFFB3261E)
++val tertiaryContainerLight = Color(0xFFCFFAFE)
++val onTertiaryContainerLight = Color(0xFF164E63)
++val errorLight = Color(0xFFDC2626)
+ val onErrorLight = Color(0xFFFFFFFF)
+-val errorContainerLight = Color(0xFFF9DEDC)
+-val onErrorContainerLight = Color(0xFF8C1D18)
+-val backgroundLight = Color(0xFF1A1A1A)
+-val onBackgroundLight = Color(0xFF1F1F1F)
+-val surfaceLight = Color(0xFF1A1A1A)
+-val onSurfaceLight = Color(0xFF1F1F1F)
+-val surfaceVariantLight = Color(0xFFE1E3E1)
+-val onSurfaceVariantLight = Color(0xFF444746)
++val errorContainerLight = Color(0xFFFEE2E2)
++val onErrorContainerLight = Color(0xFF7F1D1D)
++val backgroundLight = Color(0xFFFFFFFF)
++val onBackgroundLight = Color(0xFF111827)
++val surfaceLight = Color(0xFFFFFFFF)
++val onSurfaceLight = Color(0xFF111827)
++val surfaceVariantLight = Color(0xFFF3F4F6)
++val onSurfaceVariantLight = Color(0xFF4B5563)
+ val surfaceContainerLowestLight = Color(0xFFFFFFFF)
+-val surfaceContainerLowLight = Color(0xFFF8FAFD)
+-val surfaceContainerLight = Color(0xFF1A1A1A)
+-val surfaceContainerHighLight = Color(0xFFE9EEF6)
+-val surfaceContainerHighestLight = Color(0xFFDDE3EA)
+-val inverseSurfaceLight = Color(0xFF303030)
+-val inverseOnSurfaceLight = Color(0xFFF2F2F2)
+-val outlineLight = Color(0xFF747775)
+-val outlineVariantLight = Color(0xFFC4C7C5)
 -val inversePrimaryLight = Color(0xFFA8C7FA)
-+val inversePrimaryLight = Color(0xFFA5B4FC)
- val surfaceDimLight = Color(0xFFD3DBE5)
+-val surfaceDimLight = Color(0xFFD3DBE5)
++val surfaceContainerLowLight = Color(0xFFFAFAFB)
++val surfaceContainerLight = Color(0xFFF7F8FA)
++val surfaceContainerHighLight = Color(0xFFF0F1F4)
++val surfaceContainerHighestLight = Color(0xFFE7E9EE)
++val inverseSurfaceLight = Color(0xFF1F2937)
++val inverseOnSurfaceLight = Color(0xFFF9FAFB)
++val outlineLight = Color(0xFF9CA3AF)
++val outlineVariantLight = Color(0xFFE5E7EB)
++val inversePrimaryLight = Color(0xFFC4B5FD)
++val surfaceDimLight = Color(0xFFE5E7EB)
  val surfaceBrightLight = Color(0xFFFFFFFF)
  val scrimLight = Color(0xFF000000)
  
@@ -922,44 +969,211 @@ index 2f99969..d69c74f 100644
 -val onPrimaryDark = Color(0xFF062E6F)
 -val primaryContainerDark = Color(0xFF0842A0)
 -val onPrimaryContainerDark = Color(0xFFD3E3FD)
-+val primaryDark = Color(0xFFA5B4FC) // QSI accent
-+val onPrimaryDark = Color(0xFF1E1B4B)
-+val primaryContainerDark = Color(0xFF3730A3)
-+val onPrimaryContainerDark = Color(0xFFE0E7FF)
- val secondaryDark = Color(0xFF7FCFFF)
- val onSecondaryDark = Color(0xFF003355)
- val secondaryContainerDark = Color(0xFF004A77)
-@@ -85,7 +85,7 @@ val inverseSurfaceDark = Color(0xFFE3E3E3)
- val inverseOnSurfaceDark = Color(0xFF303030)
- val outlineDark = Color(0xFF8E918F)
- val outlineVariantDark = Color(0xFF444746)
+-val secondaryDark = Color(0xFF7FCFFF)
+-val onSecondaryDark = Color(0xFF003355)
+-val secondaryContainerDark = Color(0xFF004A77)
+-val onSecondaryContainerDark = Color(0xFFC2E7FF)
+-val tertiaryDark = Color(0xFF6DD58C)
+-val onTertiaryDark = Color(0xFF0A3818)
+-val tertiaryContainerDark = Color(0xFF0F5223)
+-val onTertiaryContainerDark = Color(0xFFC4EED0)
+-val errorDark = Color(0xFFF2B8B5)
+-val onErrorDark = Color(0xFF601410)
+-val errorContainerDark = Color(0xFF8C1D18)
+-val onErrorContainerDark = Color(0xFFF9DEDC)
+-val backgroundDark = Color(0xFF1A1A1A)
+-val onBackgroundDark = Color(0xFFE3E3E3)
+-val surfaceDark = Color(0xFF1A1A1A)
+-val onSurfaceDark = Color(0xFFE3E3E3)
+-val surfaceVariantDark = Color(0xFF444746)
+-val onSurfaceVariantDark = Color(0xFFC4C7C5)
+-val surfaceContainerLowestDark = Color(0xFF0E0E0E)
+-val surfaceContainerLowDark = Color(0xFF1B1B1B)
+-val surfaceContainerDark = Color(0xFF1A1A1A)
+-val surfaceContainerHighDark = Color(0xFF282A2C)
+-val surfaceContainerHighestDark = Color(0xFF333537)
+-val inverseSurfaceDark = Color(0xFFE3E3E3)
+-val inverseOnSurfaceDark = Color(0xFF303030)
+-val outlineDark = Color(0xFF8E918F)
+-val outlineVariantDark = Color(0xFF444746)
 -val inversePrimaryDark = Color(0xFF0B57D0)
-+val inversePrimaryDark = Color(0xFF4F46E5)
- val surfaceDimDark = Color(0xFF131314)
- val surfaceBrightDark = Color(0xFF37393B)
+-val surfaceDimDark = Color(0xFF131314)
+-val surfaceBrightDark = Color(0xFF37393B)
++val primaryDark = Color(0xFFC4B5FD)
++val onPrimaryDark = Color(0xFF2E1065)
++val primaryContainerDark = Color(0xFF5B21B6)
++val onPrimaryContainerDark = Color(0xFFEDE9FE)
++val secondaryDark = Color(0xFF93C5FD)
++val onSecondaryDark = Color(0xFF1E3A8A)
++val secondaryContainerDark = Color(0xFF1D4ED8)
++val onSecondaryContainerDark = Color(0xFFDBEAFE)
++val tertiaryDark = Color(0xFF67E8F9)
++val onTertiaryDark = Color(0xFF164E63)
++val tertiaryContainerDark = Color(0xFF155E75)
++val onTertiaryContainerDark = Color(0xFFCFFAFE)
++val errorDark = Color(0xFFFCA5A5)
++val onErrorDark = Color(0xFF7F1D1D)
++val errorContainerDark = Color(0xFF991B1B)
++val onErrorContainerDark = Color(0xFFFEE2E2)
++val backgroundDark = Color(0xFF0F0F14)
++val onBackgroundDark = Color(0xFFE5E7EB)
++val surfaceDark = Color(0xFF0F0F14)
++val onSurfaceDark = Color(0xFFE5E7EB)
++val surfaceVariantDark = Color(0xFF2A2A33)
++val onSurfaceVariantDark = Color(0xFFC4C7CF)
++val surfaceContainerLowestDark = Color(0xFF0A0A0E)
++val surfaceContainerLowDark = Color(0xFF16161C)
++val surfaceContainerDark = Color(0xFF1B1B22)
++val surfaceContainerHighDark = Color(0xFF24242D)
++val surfaceContainerHighestDark = Color(0xFF2E2E38)
++val inverseSurfaceDark = Color(0xFFE5E7EB)
++val inverseOnSurfaceDark = Color(0xFF1F2937)
++val outlineDark = Color(0xFF8B8D98)
++val outlineVariantDark = Color(0xFF3A3A45)
++val inversePrimaryDark = Color(0xFF6D28D9)
++val surfaceDimDark = Color(0xFF0F0F14)
++val surfaceBrightDark = Color(0xFF34343F)
  val scrimDark = Color(0xFF000000)
 diff --git a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/theme/Theme.kt b/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/theme/Theme.kt
-index cfdbaca..9ca56f7 100644
+index cfdbaca..5e9e81f 100644
 --- a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/theme/Theme.kt
 +++ b/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/theme/Theme.kt
-@@ -146,7 +146,7 @@ val LocalCustomColors = staticCompositionLocalOf { CustomColors() }
+@@ -146,8 +146,8 @@ val LocalCustomColors = staticCompositionLocalOf { CustomColors() }
  
  val lightCustomColors =
    CustomColors(
 -    appTitleGradientColors = listOf(Color(0xFF85B1F8), Color(0xFF3174F1)),
-+    appTitleGradientColors = listOf(Color(0xFFA5B4FC), Color(0xFF4F46E5)),
-     tabHeaderBgColor = Color(0xFF3174F1),
+-    tabHeaderBgColor = Color(0xFF3174F1),
++    appTitleGradientColors = listOf(Color(0xFF3B82F6), Color(0xFF7C3AED)),
++    tabHeaderBgColor = Color(0xFF6D28D9),
      taskCardBgColor = surfaceContainerLowestLight,
      taskBgColors =
-@@ -224,7 +224,7 @@ val lightCustomColors =
+       listOf(
+@@ -162,31 +162,31 @@ val lightCustomColors =
+       ),
+     taskBgGradientColors =
+       listOf(
+-        // dark grey gradient
+-        listOf(Color(0xFF4A4A4A), Color(0xFF2C2C2C)),
+-        // dark grey gradient
+-        listOf(Color(0xFF4A4A4A), Color(0xFF2C2C2C)),
+-        // dark grey gradient
+-        listOf(Color(0xFF4A4A4A), Color(0xFF2C2C2C)),
+-        // dark grey gradient
+-        listOf(Color(0xFF4A4A4A), Color(0xFF2C2C2C)),
++        // violet
++        listOf(Color(0xFFF5F3FF), Color(0xFFEDE9FE)),
++        // blue
++        listOf(Color(0xFFEFF6FF), Color(0xFFDBEAFE)),
++        // teal
++        listOf(Color(0xFFECFEFF), Color(0xFFCFFAFE)),
++        // lavender
++        listOf(Color(0xFFFAF5FF), Color(0xFFF3E8FF)),
+       ),
+     taskIconColors =
+       listOf(
+-        // green gradient 1
+-        Color(0xFF2D5A2D),
+-        // green gradient 2
+-        Color(0xFF128937),
+-        // phosphorus green
+-        Color(0xFF4BFF00),
+-        // green gradient 3
+-        Color(0xFF1A331A),
++        // violet
++        Color(0xFF6D28D9),
++        // blue
++        Color(0xFF2563EB),
++        // teal
++        Color(0xFF0891B2),
++        // deep violet
++        Color(0xFF7C3AED),
+       ),
+     taskIconShapeBgColor = Color.White,
+-    homeBottomGradient = listOf(Color(0x00F8F9FF), Color(0xffFFEFC9)),
++    homeBottomGradient = listOf(Color(0x00FFFFFF), Color(0xFFEDE9FE)),
+     agentBubbleBgColor = Color(0xFFe9eef6),
+     userBubbleBgColor = Color(0xFF32628D),
+-    linkColor = Color(0xFF32628D),
++    linkColor = Color(0xFF6D28D9),
+     successColor = Color(0xff3d860b),
+     recordButtonBgColor = Color(0xFFEE675C),
+     waveFormBgColor = Color(0xFFaaaaaa),
+@@ -224,8 +224,8 @@ val lightCustomColors =
  
  val darkCustomColors =
    CustomColors(
 -    appTitleGradientColors = listOf(Color(0xFF85B1F8), Color(0xFF3174F1)),
-+    appTitleGradientColors = listOf(Color(0xFFA5B4FC), Color(0xFF4F46E5)),
-     tabHeaderBgColor = Color(0xFF3174F1),
+-    tabHeaderBgColor = Color(0xFF3174F1),
++    appTitleGradientColors = listOf(Color(0xFF3B82F6), Color(0xFF7C3AED)),
++    tabHeaderBgColor = Color(0xFF6D28D9),
      taskCardBgColor = surfaceContainerHighDark,
      taskBgColors =
+       listOf(
+@@ -240,28 +240,28 @@ val darkCustomColors =
+       ),
+     taskBgGradientColors =
+       listOf(
+-        // dark grey gradient
+-        listOf(Color(0xFF4A4A4A), Color(0xFF2C2C2C)),
+-        // dark grey gradient
+-        listOf(Color(0xFF4A4A4A), Color(0xFF2C2C2C)),
+-        // dark grey gradient
+-        listOf(Color(0xFF4A4A4A), Color(0xFF2C2C2C)),
+-        // dark grey gradient
+-        listOf(Color(0xFF4A4A4A), Color(0xFF2C2C2C)),
++        // violet
++        listOf(Color(0xFF2E1065), Color(0xFF1E1B4B)),
++        // blue
++        listOf(Color(0xFF1E3A8A), Color(0xFF172554)),
++        // teal
++        listOf(Color(0xFF164E63), Color(0xFF083344)),
++        // lavender
++        listOf(Color(0xFF3B0764), Color(0xFF2E1065)),
+       ),
+     taskIconColors =
+       listOf(
+-        // green gradient 1
+-        Color(0xFF2D5A2D),
+-        // green gradient 2
+-        Color(0xFF41A15F),
+-        // phosphorus green
+-        Color(0xFF4BFF00),
+-        // green gradient 3
+-        Color(0xFF1A331A),
++        // violet
++        Color(0xFF6D28D9),
++        // blue
++        Color(0xFF2563EB),
++        // teal
++        Color(0xFF0891B2),
++        // deep violet
++        Color(0xFF7C3AED),
+       ),
+-    taskIconShapeBgColor = Color(0xFF202124),
+-    homeBottomGradient = listOf(Color(0x00F8F9FF), Color(0x1AF6AD01)),
++    taskIconShapeBgColor = Color(0xFF1B1B22),
++    homeBottomGradient = listOf(Color(0x00000000), Color(0x336D28D9)),
+     agentBubbleBgColor = Color(0xFF1b1c1d),
+     userBubbleBgColor = Color(0xFF1f3760),
+     linkColor = Color(0xFF9DCAFC),
+@@ -326,13 +326,9 @@ fun GalleryTheme(content: @Composable () -> Unit) {
+ 
+   StatusBarColorController(useDarkTheme = darkTheme)
+ 
+-  // Box: Use Material 3 You dynamic colors extracted from wallpaper.
+-  // minSdk 35 guarantees dynamic color is always available.
+-  val context = view.context
+-  val colorScheme = when {
+-    darkTheme -> androidx.compose.material3.dynamicDarkColorScheme(context)
+-    else -> androidx.compose.material3.dynamicLightColorScheme(context)
+-  }
++  // QSI Offline: a fixed brand palette (Color.kt) rather than colours taken from the wallpaper,
++  // so the app looks like quantumsi.in on every phone.
++  val colorScheme = if (darkTheme) darkScheme else lightScheme
+ 
+   // Derive custom colors from the dynamic scheme for backward compatibility
+   val customColorsPalette = if (darkTheme) {
 diff --git a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/whisper/WhisperScreen.kt b/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/whisper/WhisperScreen.kt
 index 49fffaf..a4f732b 100644
 --- a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/whisper/WhisperScreen.kt
@@ -1075,12 +1289,12 @@ index 72ada69..c5f2344 100644
          }
        }
 diff --git a/Android/src/app/src/main/res/drawable/ic_app_icon_background.xml b/Android/src/app/src/main/res/drawable/ic_app_icon_background.xml
-index dd7e7f1..279097d 100644
+index dd7e7f1..de52f70 100644
 --- a/Android/src/app/src/main/res/drawable/ic_app_icon_background.xml
 +++ b/Android/src/app/src/main/res/drawable/ic_app_icon_background.xml
 @@ -1,10 +1,11 @@
  <?xml version="1.0" encoding="utf-8"?>
-+<!-- QSI Offline launcher background. Placeholder brand colour; swap for the QSI palette. -->
++<!-- QSI Offline launcher background. White, like the quantumsi.in page. -->
  <vector xmlns:android="http://schemas.android.com/apk/res/android"
      android:width="108dp"
      android:height="108dp"
@@ -1088,34 +1302,30 @@ index dd7e7f1..279097d 100644
      android:viewportHeight="108">
      <path
 -        android:fillColor="#000000"
-+        android:fillColor="#1E1B4B"
++        android:fillColor="#FFFFFF"
          android:pathData="M0,0h108v108h-108z" />
  </vector>
 diff --git a/Android/src/app/src/main/res/drawable/ic_app_icon_foreground.xml b/Android/src/app/src/main/res/drawable/ic_app_icon_foreground.xml
-index d9e5203..2444c4d 100644
+index d9e5203..c191f08 100644
 --- a/Android/src/app/src/main/res/drawable/ic_app_icon_foreground.xml
 +++ b/Android/src/app/src/main/res/drawable/ic_app_icon_foreground.xml
-@@ -1,60 +1,22 @@
+@@ -1,60 +1,20 @@
 +<?xml version="1.0" encoding="utf-8"?>
-+<!-- QSI Offline mark: a "Q" ring with an orbiting point, inside the adaptive-icon safe zone. -->
++<!-- QSI Offline mark: the quantumsi.in atom, blue-to-violet, inside the adaptive-icon safe zone. -->
  <vector xmlns:android="http://schemas.android.com/apk/res/android"
-     android:width="108dp"
-     android:height="108dp"
-     android:viewportWidth="108"
-     android:viewportHeight="108">
+-    android:width="108dp"
+-    android:height="108dp"
+-    android:viewportWidth="108"
+-    android:viewportHeight="108">
 -    <!-- 3D Isometric Box with monochrome design and depth -->
 -    
 -    <!-- Top face (lightest) -->
-     <path
+-    <path
 -        android:fillColor="#E0E0E0"
 -        android:pathData="M54,25 L78,40 L54,55 L30,40 Z" />
 -    
 -    <!-- Left face (medium) -->
-+        android:strokeColor="#A5B4FC"
-+        android:strokeWidth="8.5"
-+        android:fillColor="#00000000"
-+        android:pathData="M30,52a22,22 0,1 0,44 0a22,22 0,1 0,-44 0" />
-     <path
+-    <path
 -        android:fillColor="#B0B0B0"
 -        android:pathData="M30,40 L30,70 L54,85 L54,55 Z" />
 -    
@@ -1140,13 +1350,8 @@ index d9e5203..2444c4d 100644
 -        android:pathData="M54,57 L54,77 L73,65 L73,45 Z" />
 -    
 -    <!-- Highlight edges for extra depth -->
-+        android:strokeColor="#FFFFFF"
-+        android:strokeWidth="8.5"
-+        android:strokeLineCap="round"
-+        android:fillColor="#00000000"
-+        android:pathData="M63,63L75,75" />
-     <path
-         android:fillColor="#FFFFFF"
+-    <path
+-        android:fillColor="#FFFFFF"
 -        android:pathData="M54,25 L54,30 L35,42 L30,40 Z" />
 -    
 -    <path
@@ -1166,10 +1371,25 @@ index d9e5203..2444c4d 100644
 -    <path
 -        android:fillColor="#303030"
 -        android:pathData="M35,65 L54,77 L73,65 L54,53 Z" />
-+        android:pathData="M68,33a5,5 0,1 0,10 0a5,5 0,1 0,-10 0" />
++    xmlns:aapt="http://schemas.android.com/aapt"
++    android:width="108dp" android:height="108dp"
++    android:viewportWidth="108" android:viewportHeight="108">
++    <group android:rotation="0" android:pivotX="54" android:pivotY="54">
++        <path android:pathData="M28,54A26,10 0 1,0 80,54A26,10 0 1,0 28,54Z" android:strokeWidth="3.6" android:fillColor="#00000000"><aapt:attr name="android:strokeColor"><gradient android:type="linear" android:startX="24" android:startY="24" android:endX="84" android:endY="84"><item android:offset="0" android:color="#3B82F6"/><item android:offset="1" android:color="#7C3AED"/></gradient></aapt:attr></path>
++        <path android:pathData="M80,54m-3.2,0a3.2,3.2 0 1,0 6.4,0a3.2,3.2 0 1,0 -6.4,0" android:fillColor="#7C3AED"/>
++    </group>
++    <group android:rotation="60" android:pivotX="54" android:pivotY="54">
++        <path android:pathData="M28,54A26,10 0 1,0 80,54A26,10 0 1,0 28,54Z" android:strokeWidth="3.6" android:fillColor="#00000000"><aapt:attr name="android:strokeColor"><gradient android:type="linear" android:startX="24" android:startY="24" android:endX="84" android:endY="84"><item android:offset="0" android:color="#3B82F6"/><item android:offset="1" android:color="#7C3AED"/></gradient></aapt:attr></path>
++        <path android:pathData="M28,54m-3.2,0a3.2,3.2 0 1,0 6.4,0a3.2,3.2 0 1,0 -6.4,0" android:fillColor="#7C3AED"/>
++    </group>
++    <group android:rotation="120" android:pivotX="54" android:pivotY="54">
++        <path android:pathData="M28,54A26,10 0 1,0 80,54A26,10 0 1,0 28,54Z" android:strokeWidth="3.6" android:fillColor="#00000000"><aapt:attr name="android:strokeColor"><gradient android:type="linear" android:startX="24" android:startY="24" android:endX="84" android:endY="84"><item android:offset="0" android:color="#3B82F6"/><item android:offset="1" android:color="#7C3AED"/></gradient></aapt:attr></path>
++        <path android:pathData="M80,54m-3.2,0a3.2,3.2 0 1,0 6.4,0a3.2,3.2 0 1,0 -6.4,0" android:fillColor="#7C3AED"/>
++    </group>
++    <path android:pathData="M54,54m-6.5,0a6.5,6.5 0 1,0 13,0a6.5,6.5 0 1,0 -13,0"><aapt:attr name="android:fillColor"><gradient android:type="linear" android:startX="24" android:startY="24" android:endX="84" android:endY="84"><item android:offset="0" android:color="#3B82F6"/><item android:offset="1" android:color="#7C3AED"/></gradient></aapt:attr></path>
  </vector>
 diff --git a/Android/src/app/src/main/res/values-night/themes.xml b/Android/src/app/src/main/res/values-night/themes.xml
-index 69b30fb..bb0a8a4 100644
+index 69b30fb..686cb0e 100644
 --- a/Android/src/app/src/main/res/values-night/themes.xml
 +++ b/Android/src/app/src/main/res/values-night/themes.xml
 @@ -19,7 +19,8 @@
@@ -1178,12 +1398,12 @@ index 69b30fb..bb0a8a4 100644
      <item name="windowSplashScreenBackground">#FF131314</item>
 -    <item name="windowSplashScreenAnimatedIcon">@drawable/splash_screen_animated_icon</item>
 +    <item name="windowSplashScreenAnimatedIcon">@drawable/ic_app_icon_foreground</item>
-+    <item name="windowSplashScreenIconBackgroundColor">#1E1B4B</item>
++    <item name="windowSplashScreenIconBackgroundColor">#FFFFFF</item>
      <item name="postSplashScreenTheme">@style/Theme.Gallery</item>
    </style>
    <style name="Theme.Gallery.OssLicenses" parent="Theme.AppCompat">
 diff --git a/Android/src/app/src/main/res/values/strings.xml b/Android/src/app/src/main/res/values/strings.xml
-index dd16e90..72de01d 100644
+index dd16e90..8d056fe 100644
 --- a/Android/src/app/src/main/res/values/strings.xml
 +++ b/Android/src/app/src/main/res/values/strings.xml
 @@ -26,15 +26,15 @@
@@ -1238,20 +1458,22 @@ index dd16e90..72de01d 100644
    <string name="agent_skills" translatable="false">Agent Skills</string>
    <string name="agent_skills_description" translatable="false">Use specialized, high-order reasoning by loading different skills or creating your own.\n\nTry tapping a sample prompt below to see Agent Skills in action!</string>
 -  <string name="disclaimer_dialog_content" translatable="false">Third-party skills are not authored or endorsed by Google. Google is not responsible for their contents, security, or data handling practices.
-+  <string name="disclaimer_dialog_content" translatable="false">Third-party skills are not authored or endorsed by Quantum SI. Quantum SI is not responsible for their contents, security, or data handling practices.
++  <string name="disclaimer_dialog_content" translatable="false">Third-party skills are not authored or endorsed by Quantum Synthetic Intelligence. Quantum Synthetic Intelligence is not responsible for their contents, security, or data handling practices.
  
  Please exercise caution before providing sensitive information, such as personal identification, tokens, or API keys.
  
 diff --git a/Android/src/app/src/main/res/values/themes.xml b/Android/src/app/src/main/res/values/themes.xml
-index 2048f0d..fd6bf18 100644
+index 2048f0d..e28c78f 100644
 --- a/Android/src/app/src/main/res/values/themes.xml
 +++ b/Android/src/app/src/main/res/values/themes.xml
-@@ -20,6 +20,8 @@
+@@ -19,7 +19,9 @@
+   <style name="Theme.Gallery" parent="android:Theme.Material.NoActionBar" />
    <style name="Theme.Gallery.SplashScreen" parent="Theme.SplashScreen">
        <!-- Black splash screen background -->
-       <item name="windowSplashScreenBackground">#FF000000</item>
+-      <item name="windowSplashScreenBackground">#FF000000</item>
++      <item name="windowSplashScreenBackground">#FFFFFFFF</item>
 +      <item name="windowSplashScreenAnimatedIcon">@drawable/ic_app_icon_foreground</item>
-+      <item name="windowSplashScreenIconBackgroundColor">#1E1B4B</item>
++      <item name="windowSplashScreenIconBackgroundColor">#FFFFFF</item>
        <item name="postSplashScreenTheme">@style/Theme.Gallery</item>
    </style>
    <style name="Theme.Gallery.OssLicenses" parent="Theme.AppCompat.Light.DarkActionBar">

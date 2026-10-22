@@ -27,14 +27,14 @@ phone, and chat history is stored encrypted behind a biometric lock (both from B
 - Native code is built for arm64 only (every current phone), which cuts build time and size.
 - About screen credits Box and Google AI Edge Gallery, as their Apache 2.0 licence requires.
 
-## Brand placeholders
+## Brand
 
-No brand assets were available, so the icon (a "Q" orbit mark) and the indigo accent are
-placeholders. To use the real ones, edit in the Box checkout and regenerate the patch:
-
-- Colours: `Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/theme/Color.kt`
-  (the lines marked `QSI accent`) and `Theme.kt` (`appTitleGradientColors`)
-- Icon: `Android/src/app/src/main/res/drawable/ic_app_icon_{background,foreground}.xml`
+Matched to quantumsi.in: a white light theme with a violet accent (`#6D28D9`), the
+blue-to-violet of the site's atom mark for the title gradient and the launcher icon,
+and a charcoal dark theme with the same accents. Box's wallpaper-derived Material You
+colours are replaced by this fixed palette so the app looks the same on every phone.
+To adjust: `ui/theme/Color.kt` (palette), `ui/theme/Theme.kt` (gradients, card tints)
+and `res/drawable/ic_app_icon_{background,foreground}.xml` (icon), then regenerate the patch.
 
 ## Building
 
