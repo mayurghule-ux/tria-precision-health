@@ -578,7 +578,7 @@ index 4c391a3..fa3b5c5 100644
          mutableListOf(
            Model(
 diff --git a/Android/src/app/src/main/java/com/google/ai/edge/gallery/customtasks/mobileactions/MobileActionsScreen.kt b/Android/src/app/src/main/java/com/google/ai/edge/gallery/customtasks/mobileactions/MobileActionsScreen.kt
-index cc14703..4e913e5 100644
+index cc14703..a500d6c 100644
 --- a/Android/src/app/src/main/java/com/google/ai/edge/gallery/customtasks/mobileactions/MobileActionsScreen.kt
 +++ b/Android/src/app/src/main/java/com/google/ai/edge/gallery/customtasks/mobileactions/MobileActionsScreen.kt
 @@ -171,7 +171,7 @@ private val PROMPT_TEMPLATES =
@@ -590,6 +590,15 @@ index cc14703..4e913e5 100644
      ),
      PromptTemplate(
        labelResId = R.string.prompt_template_label_open_wifi_settings,
+@@ -195,7 +195,7 @@ private val PROMPT_TEMPLATES =
+     ),
+     PromptTemplate(
+       labelResId = R.string.prompt_template_label_open_url,
+-      prompt = "Open google.com in the browser",
++      prompt = "Open quantumsi.in in the browser",
+     ),
+     PromptTemplate(
+       labelResId = R.string.prompt_template_label_open_bluetooth_settings,
 diff --git a/Android/src/app/src/main/java/com/google/ai/edge/gallery/customtasks/mobileactions/MobileActionsTask.kt b/Android/src/app/src/main/java/com/google/ai/edge/gallery/customtasks/mobileactions/MobileActionsTask.kt
 index 592a608..1528644 100644
 --- a/Android/src/app/src/main/java/com/google/ai/edge/gallery/customtasks/mobileactions/MobileActionsTask.kt
@@ -663,10 +672,36 @@ index 8e2da78..0fd082a 100644
  
      // Misc.
 diff --git a/Android/src/app/src/main/java/com/google/ai/edge/gallery/runtime/aicore/AICoreModelHelper.kt b/Android/src/app/src/main/java/com/google/ai/edge/gallery/runtime/aicore/AICoreModelHelper.kt
-index 3a3624c..19f0792 100644
+index 3a3624c..55e572d 100644
 --- a/Android/src/app/src/main/java/com/google/ai/edge/gallery/runtime/aicore/AICoreModelHelper.kt
 +++ b/Android/src/app/src/main/java/com/google/ai/edge/gallery/runtime/aicore/AICoreModelHelper.kt
-@@ -154,7 +154,7 @@ object AICoreModelHelper : LlmModelHelper {
+@@ -19,7 +19,6 @@ package com.google.ai.edge.gallery.runtime.aicore
+ import android.content.Context
+ import android.graphics.Bitmap
+ import android.util.Log
+-import com.google.ai.edge.gallery.common.cleanUpMediapipeTaskErrorMessage
+ import com.google.ai.edge.gallery.data.AICoreModelPreference
+ import com.google.ai.edge.gallery.data.AICoreModelReleaseStage
+ import com.google.ai.edge.gallery.data.ConfigKeys
+@@ -99,7 +98,7 @@ object AICoreModelHelper : LlmModelHelper {
+                   onDone("Downloading (${downloadStatus.totalBytesDownloaded} bytes)")
+                 }
+                 is DownloadStatus.DownloadFailed -> {
+-                  onDone("Download failed: ${downloadStatus.e.message}")
++                  onDone("The on-device AI engine could not be prepared. Try again later.")
+                 }
+                 is DownloadStatus.DownloadCompleted -> {
+                   generativeModel.warmup()
+@@ -119,7 +118,7 @@ object AICoreModelHelper : LlmModelHelper {
+         }
+       } catch (e: Exception) {
+         Log.e(TAG, "Initialization failed", e)
+-        onDone(cleanUpMediapipeTaskErrorMessage(e.message ?: "Unknown error"))
++        onDone("The on-device AI engine could not be prepared. Try again later.")
+       }
+     }
+   }
+@@ -154,7 +153,7 @@ object AICoreModelHelper : LlmModelHelper {
                    onProgress(downloadStatus.totalBytesDownloaded, totalBytesToDownload)
                  }
                  is DownloadStatus.DownloadFailed -> {
@@ -675,7 +710,7 @@ index 3a3624c..19f0792 100644
                  }
                  is DownloadStatus.DownloadCompleted -> {
                    onDone()
-@@ -163,7 +163,7 @@ object AICoreModelHelper : LlmModelHelper {
+@@ -163,7 +162,7 @@ object AICoreModelHelper : LlmModelHelper {
              }
            }
            FeatureStatus.UNAVAILABLE -> {
@@ -684,7 +719,7 @@ index 3a3624c..19f0792 100644
            }
            else -> {
              onError("Unknown feature status: $status")
-@@ -171,7 +171,7 @@ object AICoreModelHelper : LlmModelHelper {
+@@ -171,7 +170,7 @@ object AICoreModelHelper : LlmModelHelper {
          }
        } catch (e: Exception) {
          Log.e(TAG, "Download failed", e)
@@ -693,6 +728,15 @@ index 3a3624c..19f0792 100644
        }
      }
    }
+@@ -329,7 +328,7 @@ object AICoreModelHelper : LlmModelHelper {
+       // Skip invoking resultListener to avoid ambiguous cancellation state
+     } catch (e: Exception) {
+       Log.e(TAG, "onError", e)
+-      onError("Error: ${e.message}")
++      onError("QSI Nano could not answer this time. Please try again.")
+     }
+   }
+ 
 diff --git a/Android/src/app/src/main/java/com/google/ai/edge/gallery/security/BiometricEncryptionManager.kt b/Android/src/app/src/main/java/com/google/ai/edge/gallery/security/BiometricEncryptionManager.kt
 index 74ecf58..a4a6292 100644
 --- a/Android/src/app/src/main/java/com/google/ai/edge/gallery/security/BiometricEncryptionManager.kt
@@ -819,9 +863,44 @@ index e210cca..cdcadad 100644
                  withContext(Dispatchers.Main) {
                      if (saved) Toast.makeText(context, "Saved to Downloads/$fileName", Toast.LENGTH_LONG).show()
 diff --git a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/home/HomeScreen.kt b/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/home/HomeScreen.kt
-index e2d37bd..9058d24 100644
+index e2d37bd..b60e788 100644
 --- a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/home/HomeScreen.kt
 +++ b/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/home/HomeScreen.kt
+@@ -340,7 +340,7 @@ fun HomeScreen(
+         gesturesEnabled = drawerState.isOpen,
+       ) {
+         Scaffold(
+-          containerColor = Color.Black, // Black background
++          containerColor = MaterialTheme.colorScheme.background,
+           topBar = {
+             // Top bar animation:
+             //
+@@ -381,9 +381,9 @@ fun HomeScreen(
+                 .background(
+                   Brush.radialGradient(
+                     colors = listOf(
+-                      Color(0xFF1A1A1A), // Dark grey center
+-                      Color(0xFF141414), // Medium dark grey mid
+-                      Color.Black // Black edges
++                      MaterialTheme.colorScheme.surfaceContainer,
++                      MaterialTheme.colorScheme.surfaceContainerLow,
++                      MaterialTheme.colorScheme.background,
+                     ),
+                     radius = 2000f
+                   )
+@@ -397,9 +397,9 @@ fun HomeScreen(
+                   .background(
+                     Brush.radialGradient(
+                       colors = listOf(
+-                        Color(0xFF1A1A1A), // Dark grey center
+-                        Color(0xFF141414), // Medium dark grey mid
+-                        Color.Black // Black edges
++                        MaterialTheme.colorScheme.surfaceContainer,
++                        MaterialTheme.colorScheme.surfaceContainerLow,
++                        MaterialTheme.colorScheme.background,
+                       ),
+                       radius = 2000f
+                     )
 @@ -493,26 +493,7 @@ fun HomeScreen(
                      Spacer(modifier = Modifier.width(4.dp))
                      Text("History", maxLines = 1)
@@ -1173,7 +1252,7 @@ index 597fef6..7248af7 100644
              val uri = context.contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
              uri?.let {
 diff --git a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/llmchat/LlmChatModelHelper.kt b/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/llmchat/LlmChatModelHelper.kt
-index 661fd37..a15b80b 100644
+index 661fd37..f7b3e8b 100644
 --- a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/llmchat/LlmChatModelHelper.kt
 +++ b/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/llmchat/LlmChatModelHelper.kt
 @@ -143,7 +143,8 @@ object LlmChatModelHelper : LlmModelHelper {
@@ -1182,7 +1261,7 @@ index 661fd37..a15b80b 100644
      } catch (e: Exception) {
 -      onDone(cleanUpMediapipeTaskErrorMessage(e.message ?: "Unknown error"))
 +      Log.e(TAG, "Model initialization failed", e)
-+      onDone("QSI Core could not start on this device. Try another accelerator in settings, or download it again.")
++      onDone("${model.name} could not start on this device. Try another accelerator in settings, or download it again.")
        return
      }
      onDone("")
@@ -1650,18 +1729,43 @@ index cfdbaca..ee5f1b6 100644
        linkColor = colorScheme.primary,
        tabHeaderBgColor = colorScheme.primary,
 diff --git a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/whisper/WhisperScreen.kt b/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/whisper/WhisperScreen.kt
-index 49fffaf..a4f732b 100644
+index 49fffaf..d1b1425 100644
 --- a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/whisper/WhisperScreen.kt
 +++ b/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/whisper/WhisperScreen.kt
-@@ -83,7 +83,7 @@ fun WhisperScreen(
+@@ -82,12 +82,27 @@ fun WhisperScreen(
+     ) {
          if (!modelReady) {
              Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                 Text(
+-                Text(
 -                    "Download and initialize a Whisper model to get started",
-+                    "Download QSI Voice to get started",
-                     style = MaterialTheme.typography.bodyMedium,
-                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                     textAlign = TextAlign.Center,
+-                    style = MaterialTheme.typography.bodyMedium,
+-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+-                    textAlign = TextAlign.Center,
+-                )
++                if (initStatus?.status == ModelInitializationStatusType.INITIALIZING) {
++                    Column(
++                        horizontalAlignment = Alignment.CenterHorizontally,
++                        verticalArrangement = Arrangement.spacedBy(8.dp),
++                    ) {
++                        CircularProgressIndicator()
++                        Text(
++                            "Loading QSI Voice…",
++                            style = MaterialTheme.typography.bodyMedium,
++                            color = MaterialTheme.colorScheme.onSurfaceVariant,
++                            textAlign = TextAlign.Center,
++                        )
++                    }
++                } else {
++                    Text(
++                        "Download QSI Voice to get started",
++                        style = MaterialTheme.typography.bodyMedium,
++                        color = MaterialTheme.colorScheme.onSurfaceVariant,
++                        textAlign = TextAlign.Center,
++                    )
++                }
+             }
+             return@Column
+         }
 diff --git a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/whisper/WhisperTaskModule.kt b/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/whisper/WhisperTaskModule.kt
 index 0f0078b..cb60910 100644
 --- a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/whisper/WhisperTaskModule.kt
