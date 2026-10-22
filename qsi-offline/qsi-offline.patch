@@ -46,7 +46,7 @@ index b8be89f..d363c2e 100644
          android:supportsRtl="true"
          android:theme="@style/Theme.Gallery"
 diff --git a/Android/src/app/src/main/assets/model_allowlist.json b/Android/src/app/src/main/assets/model_allowlist.json
-index d186837..bcf3718 100644
+index d186837..8528541 100644
 --- a/Android/src/app/src/main/assets/model_allowlist.json
 +++ b/Android/src/app/src/main/assets/model_allowlist.json
 @@ -1,13 +1,13 @@
@@ -68,13 +68,15 @@ index d186837..bcf3718 100644
        "llmSupportImage": true,
        "llmSupportAudio": true,
        "llmSupportThinking": true,
-@@ -33,139 +33,8 @@
+@@ -33,103 +33,40 @@
          "llm_agent_chat",
          "llm_ask_image",
          "llm_ask_audio"
 -      ]
--    },
--    {
++      ],
++      "url": "https://huggingface.co/litert-community/gemma-4-E2B-it-litert-lm/resolve/7fa1d78473894f7e736a21d920c3aa80f950c0db/gemma-4-E2B-it.litertlm?download=true"
+     },
+     {
 -      "name": "Gemma-4-E4B-it",
 -      "modelId": "litert-community/gemma-4-E4B-it-litert-lm",
 -      "modelFile": "gemma-4-E4B-it.litertlm",
@@ -85,17 +87,30 @@ index d186837..bcf3718 100644
 -      "llmSupportImage": true,
 -      "llmSupportAudio": true,
 -      "llmSupportThinking": true,
--      "defaultConfig": {
++      "name": "QSI Nano",
++      "modelId": "qsi/qsi-nano",
++      "modelFile": "qsi-nano",
++      "commitHash": "1",
++      "runtimeType": "aicore",
++      "aicoreReleaseStage": "stable",
++      "aicorePreference": "fast",
++      "description": "Uses the AI built into recent phones (for example current Pixel and Galaxy models) with nothing to download inside the app. Lighter and quicker than QSI Core; text only. If your phone does not have it, the button says so.",
++      "sizeInBytes": 0,
+       "defaultConfig": {
 -        "topK": 64,
--        "topP": 0.95,
++        "topK": 40,
+         "topP": 0.95,
 -        "temperature": 1.0,
 -        "maxContextLength": 32000,
 -        "maxTokens": 4000,
 -        "accelerators": "gpu,npu,cpu",
 -        "visionAccelerator": "gpu"
--      },
--      "taskTypes": [
--        "llm_chat",
++        "temperature": 0.9,
++        "maxTokens": 1024,
++        "accelerators": "cpu"
+       },
+       "taskTypes": [
+         "llm_chat",
 -        "llm_prompt_lab",
 -        "llm_agent_chat",
 -        "llm_ask_image",
@@ -107,9 +122,10 @@ index d186837..bcf3718 100644
 -        "llm_agent_chat",
 -        "llm_ask_image",
 -        "llm_ask_audio"
--      ]
--    },
--    {
++        "llm_prompt_lab"
+       ]
+     },
+     {
 -      "name": "Gemma3-1B-IT",
 -      "modelId": "litert-community/Gemma3-1B-IT",
 -      "modelFile": "gemma3-1b-it-int4.litertlm",
@@ -166,49 +182,38 @@ index d186837..bcf3718 100644
 -      "modelId": "litert-community/functiongemma-270m-ft-tiny-garden",
 -      "modelFile": "tiny_garden_q8_ekv1024.litertlm",
 -      "description": "Fine-tuned Function Gemma 270M model for Tiny Garden.",
--      "sizeInBytes": 288964608,
--      "minDeviceMemoryInGb": 4,
++      "name": "QSI Garden",
++      "modelId": "qsi/qsi-garden",
++      "modelFile": "qsi-garden.litertlm",
++      "url": "https://huggingface.co/litert-community/functiongemma-270m-ft-tiny-garden/resolve/c205853ff82da86141a1105faa2344a8b176dfe7/tiny_garden_q8_ekv1024.litertlm?download=true",
++      "description": "The small QSI engine behind the Garden game. Runs on any phone.",
+       "sizeInBytes": 288964608,
+       "minDeviceMemoryInGb": 4,
 -      "commitHash": "c205853ff82da86141a1105faa2344a8b176dfe7",
--      "defaultConfig": {
--        "topK": 64,
--        "topP": 0.95,
--        "temperature": 0.0,
--        "maxTokens": 1024,
--        "accelerators": "cpu"
--      },
--      "taskTypes": [
--        "llm_tiny_garden"
--      ],
--      "bestForTaskTypes": [
--        "llm_tiny_garden"
--      ]
--    },
--    {
++      "commitHash": "1",
+       "defaultConfig": {
+         "topK": 64,
+         "topP": 0.95,
+@@ -145,14 +82,14 @@
+       ]
+     },
+     {
 -      "name": "MobileActions-270M",
 -      "modelId": "jegly/mobile_actions_q8_ekv1024.litertlm",
 -      "modelFile": "mobile_actions_q8_ekv1024.litertlm",
--      "url": "https://huggingface.co/jegly/mobile_actions_q8_ekv1024.litertlm/resolve/main/mobile_actions_q8_ekv1024.litertlm?download=true",
++      "name": "QSI Actions",
++      "modelId": "qsi/qsi-actions",
++      "modelFile": "qsi-actions.litertlm",
+       "url": "https://huggingface.co/jegly/mobile_actions_q8_ekv1024.litertlm/resolve/main/mobile_actions_q8_ekv1024.litertlm?download=true",
 -      "description": "Fine-tuned Function Gemma 270M model for Mobile Actions.",
--      "sizeInBytes": 288964608,
--      "minDeviceMemoryInGb": 4,
++      "description": "The small QSI engine that turns a request into a phone action.",
+       "sizeInBytes": 288964608,
+       "minDeviceMemoryInGb": 4,
 -      "commitHash": "491f610",
--      "defaultConfig": {
--        "topK": 64,
--        "topP": 0.95,
--        "temperature": 0.0,
--        "maxTokens": 1024,
--        "accelerators": "cpu"
--      },
--      "taskTypes": [
--        "llm_mobile_actions"
-       ],
--      "bestForTaskTypes": [
--        "llm_mobile_actions"
--      ]
-+      "url": "https://huggingface.co/litert-community/gemma-4-E2B-it-litert-lm/resolve/7fa1d78473894f7e736a21d920c3aa80f950c0db/gemma-4-E2B-it.litertlm?download=true"
-     }
-   ]
- }
++      "commitHash": "1",
+       "defaultConfig": {
+         "topK": 64,
+         "topP": 0.95,
 diff --git a/Android/src/app/src/main/assets/skills/calculate-hash/SKILL.md b/Android/src/app/src/main/assets/skills/calculate-hash/SKILL.md
 index 678892b..c9ed5f6 100644
 --- a/Android/src/app/src/main/assets/skills/calculate-hash/SKILL.md
@@ -232,6 +237,22 @@ index 2678b8a..37ba48e 100644
        Text(
          "Authenticate to decrypt your chats",
          style = MaterialTheme.typography.bodyMedium,
+diff --git a/Android/src/app/src/main/java/com/google/ai/edge/gallery/common/Utils.kt b/Android/src/app/src/main/java/com/google/ai/edge/gallery/common/Utils.kt
+index 3cd13bd..0007c1e 100644
+--- a/Android/src/app/src/main/java/com/google/ai/edge/gallery/common/Utils.kt
++++ b/Android/src/app/src/main/java/com/google/ai/edge/gallery/common/Utils.kt
+@@ -374,7 +374,10 @@ fun Modifier.clearFocusOnKeyboardDismiss(): Modifier = composed {
+ }
+ 
+ fun isAICoreSupported(allowedDeviceModels: Set<String>?): Boolean {
+-  if (allowedDeviceModels.isNullOrEmpty()) return false
++  // QSI Offline: with no device list in the allowlist, offer the phone's built-in AI
++  // everywhere and let the runtime status check say whether this phone has it.
++  if (allowedDeviceModels == null) return true
++  if (allowedDeviceModels.isEmpty()) return false
+   val currentModel = Build.MODEL?.lowercase() ?: return false
+   return allowedDeviceModels.contains(currentModel)
+ }
 diff --git a/Android/src/app/src/main/java/com/google/ai/edge/gallery/customtasks/agentchat/AgentChatScreen.kt b/Android/src/app/src/main/java/com/google/ai/edge/gallery/customtasks/agentchat/AgentChatScreen.kt
 index ec66b65..8aca710 100644
 --- a/Android/src/app/src/main/java/com/google/ai/edge/gallery/customtasks/agentchat/AgentChatScreen.kt
@@ -317,13 +338,29 @@ index 4c391a3..fa3b5c5 100644
        models =
          mutableListOf(
            Model(
+diff --git a/Android/src/app/src/main/java/com/google/ai/edge/gallery/customtasks/mobileactions/MobileActionsScreen.kt b/Android/src/app/src/main/java/com/google/ai/edge/gallery/customtasks/mobileactions/MobileActionsScreen.kt
+index cc14703..4e913e5 100644
+--- a/Android/src/app/src/main/java/com/google/ai/edge/gallery/customtasks/mobileactions/MobileActionsScreen.kt
++++ b/Android/src/app/src/main/java/com/google/ai/edge/gallery/customtasks/mobileactions/MobileActionsScreen.kt
+@@ -171,7 +171,7 @@ private val PROMPT_TEMPLATES =
+     ),
+     PromptTemplate(
+       labelResId = R.string.prompt_template_label_show_location_on_map,
+-      prompt = "Show Googleplex on map",
++      prompt = "Show the Taj Mahal on map",
+     ),
+     PromptTemplate(
+       labelResId = R.string.prompt_template_label_open_wifi_settings,
 diff --git a/Android/src/app/src/main/java/com/google/ai/edge/gallery/customtasks/mobileactions/MobileActionsTask.kt b/Android/src/app/src/main/java/com/google/ai/edge/gallery/customtasks/mobileactions/MobileActionsTask.kt
-index 592a608..cff75f2 100644
+index 592a608..1528644 100644
 --- a/Android/src/app/src/main/java/com/google/ai/edge/gallery/customtasks/mobileactions/MobileActionsTask.kt
 +++ b/Android/src/app/src/main/java/com/google/ai/edge/gallery/customtasks/mobileactions/MobileActionsTask.kt
-@@ -52,9 +52,8 @@ class MobileActionsTask @Inject constructor() : CustomTask {
+@@ -50,11 +50,10 @@ class MobileActionsTask @Inject constructor() : CustomTask {
+     Task(
+       id = BuiltInTaskId.LLM_MOBILE_ACTIONS,
        label = "Mobile Actions",
-       description = "Perform various device actions through Function Gemma",
+-      description = "Perform various device actions through Function Gemma",
++      description = "Ask for phone actions in plain words: open apps, set alarms, send messages and more.",
        shortDescription = "Leverage device mobile actions",
 -      docUrl = "https://github.com/google-ai-edge/LiteRT-LM/blob/main/kotlin/README.md",
 -      sourceCodeUrl =
@@ -334,10 +371,15 @@ index 592a608..cff75f2 100644
        icon = Icons.Outlined.Functions,
        agentNameRes = R.string.chat_agent_agent_name,
 diff --git a/Android/src/app/src/main/java/com/google/ai/edge/gallery/customtasks/tinygarden/TinyGardenTask.kt b/Android/src/app/src/main/java/com/google/ai/edge/gallery/customtasks/tinygarden/TinyGardenTask.kt
-index 4dbd8af..694b13c 100644
+index 4dbd8af..6209b66 100644
 --- a/Android/src/app/src/main/java/com/google/ai/edge/gallery/customtasks/tinygarden/TinyGardenTask.kt
 +++ b/Android/src/app/src/main/java/com/google/ai/edge/gallery/customtasks/tinygarden/TinyGardenTask.kt
-@@ -88,9 +88,8 @@ class TinyGardenTask @Inject constructor() : CustomTask {
+@@ -84,13 +84,12 @@ class TinyGardenTask @Inject constructor() : CustomTask {
+   override val task =
+     Task(
+       id = BuiltInTaskId.LLM_TINY_GARDEN,
+-      label = "Tiny Garden",
++      label = "QSI Garden",
        description =
          "Use natural language to plant, water, and harvest in this fully offline mini-game.\n\nNote: This is powered by the experimental FunctionGemma model optimized for latency. Due to its compact size (270M), it works well on simple instructions but responses may vary to more complex interactions.",
        shortDescription = "Use natural language to plant",
@@ -363,10 +405,10 @@ index 76a676e..fafb926 100644
      // Create the NotificationChannel, but only on API 26+ because
      // the NotificationChannel class is new and not in the support library
 diff --git a/Android/src/app/src/main/java/com/google/ai/edge/gallery/data/ModelAllowlist.kt b/Android/src/app/src/main/java/com/google/ai/edge/gallery/data/ModelAllowlist.kt
-index 8e2da78..3d96d9b 100644
+index 8e2da78..0fd082a 100644
 --- a/Android/src/app/src/main/java/com/google/ai/edge/gallery/data/ModelAllowlist.kt
 +++ b/Android/src/app/src/main/java/com/google/ai/edge/gallery/data/ModelAllowlist.kt
-@@ -176,7 +176,8 @@ data class AllowedModel(
+@@ -176,11 +176,12 @@ data class AllowedModel(
            .toMutableList()
      }
  
@@ -376,6 +418,42 @@ index 8e2da78..3d96d9b 100644
  
      if (runtimeType == RuntimeType.AICORE) {
        downloadUrl = ""
+-      learnMoreUrl = "https://developers.google.com/ml-kit/terms"
++      learnMoreUrl = ""
+     }
+ 
+     // Misc.
+diff --git a/Android/src/app/src/main/java/com/google/ai/edge/gallery/runtime/aicore/AICoreModelHelper.kt b/Android/src/app/src/main/java/com/google/ai/edge/gallery/runtime/aicore/AICoreModelHelper.kt
+index 3a3624c..19f0792 100644
+--- a/Android/src/app/src/main/java/com/google/ai/edge/gallery/runtime/aicore/AICoreModelHelper.kt
++++ b/Android/src/app/src/main/java/com/google/ai/edge/gallery/runtime/aicore/AICoreModelHelper.kt
+@@ -154,7 +154,7 @@ object AICoreModelHelper : LlmModelHelper {
+                   onProgress(downloadStatus.totalBytesDownloaded, totalBytesToDownload)
+                 }
+                 is DownloadStatus.DownloadFailed -> {
+-                  onError(downloadStatus.e.message ?: "Unknown download error")
++                  onError("The on-device AI engine could not be prepared. Try again later.")
+                 }
+                 is DownloadStatus.DownloadCompleted -> {
+                   onDone()
+@@ -163,7 +163,7 @@ object AICoreModelHelper : LlmModelHelper {
+             }
+           }
+           FeatureStatus.UNAVAILABLE -> {
+-            onError("AICore model is unavailable on this device.")
++            onError("QSI Nano needs a phone with built-in on-device AI, which this phone does not provide.")
+           }
+           else -> {
+             onError("Unknown feature status: $status")
+@@ -171,7 +171,7 @@ object AICoreModelHelper : LlmModelHelper {
+         }
+       } catch (e: Exception) {
+         Log.e(TAG, "Download failed", e)
+-        onError(cleanUpMediapipeTaskErrorMessage(e.message ?: "Unknown error"))
++        onError("The on-device AI engine could not be prepared. Try again later.")
+       }
+     }
+   }
 diff --git a/Android/src/app/src/main/java/com/google/ai/edge/gallery/security/BiometricEncryptionManager.kt b/Android/src/app/src/main/java/com/google/ai/edge/gallery/security/BiometricEncryptionManager.kt
 index 74ecf58..a4a6292 100644
 --- a/Android/src/app/src/main/java/com/google/ai/edge/gallery/security/BiometricEncryptionManager.kt
@@ -448,6 +526,19 @@ index 72e98fe..7df51d8 100644
            checkingToken = true
  
            // Check if the url needs auth.
+diff --git a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/common/modelitem/AICoreAccessPanel.kt b/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/common/modelitem/AICoreAccessPanel.kt
+index 77abb22..e5b0edc 100644
+--- a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/common/modelitem/AICoreAccessPanel.kt
++++ b/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/common/modelitem/AICoreAccessPanel.kt
+@@ -64,7 +64,7 @@ fun AICoreAccessPanel() {
+         val intent =
+           Intent(
+             Intent.ACTION_VIEW,
+-            "https://developers.google.com/ml-kit/genai/aicore-dev-preview".toUri(),
++            "https://www.quantumsi.in".toUri(),
+           )
+         context.startActivity(intent)
+       },
 diff --git a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/home/ChatHistoryViewModel.kt b/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/home/ChatHistoryViewModel.kt
 index e210cca..cdcadad 100644
 --- a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/home/ChatHistoryViewModel.kt
@@ -715,6 +806,124 @@ index b1ba64d..771e70a 100644
            }
          }
  
+diff --git a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/imagegen/ImageGenScreen.kt b/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/imagegen/ImageGenScreen.kt
+index c9d0705..7f7b3f2 100644
+--- a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/imagegen/ImageGenScreen.kt
++++ b/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/imagegen/ImageGenScreen.kt
+@@ -73,7 +73,7 @@ fun ImageGenScreen(
+ 
+     LaunchedEffect(uiState.imageSaved) {
+         if (uiState.imageSaved) {
+-            snackbarHostState.showSnackbar("Saved to Pictures/LocalDiffusion")
++            snackbarHostState.showSnackbar("Saved to Pictures/QSI Offline")
+             viewModel.clearSavedFlag()
+         }
+     }
+@@ -91,19 +91,7 @@ fun ImageGenScreen(
+             ) {
+                 if (!modelReady) {
+                     ModelNotReadyPlaceholder(initStatus?.status)
+-                    OutlinedButton(
+-                        onClick = {
+-                            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+-                                addCategory(Intent.CATEGORY_OPENABLE)
+-                                type = "*/*"
+-                            }
+-                            filePicker.launch(intent)
+-                        },
+-                        modifier = Modifier.fillMaxWidth(),
+-                    ) {
+-                        Icon(Icons.Outlined.FileOpen, contentDescription = null)
+-                        Text("  Import GGUF model", fontWeight = FontWeight.SemiBold)
+-                    }
++                    // QSI Offline: models are preset, so there is no import button here.
+                     return@Column
+                 }
+ 
+diff --git a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/imagegen/ImageGenTaskModule.kt b/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/imagegen/ImageGenTaskModule.kt
+index 2baf2fe..e61cef7 100644
+--- a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/imagegen/ImageGenTaskModule.kt
++++ b/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/imagegen/ImageGenTaskModule.kt
+@@ -41,10 +41,13 @@ private val SD_CFG_CONFIG = NumberSliderConfig(
+     needReinitialization = false,
+ )
+ 
++// QSI Offline: the upstream file name is used only in the download URL; the model is
++// shown under its QSI name and stored locally under a neutral name.
+ private fun sdModel(
+     name: String,
+     modelId: String,
+     modelFile: String,
++    localFile: String,
+     commitHash: String,
+     description: String,
+     sizeInBytes: Long,
+@@ -53,10 +56,10 @@ private fun sdModel(
+     info = description,
+     url = "https://huggingface.co/$modelId/resolve/$commitHash/$modelFile?download=true",
+     sizeInBytes = sizeInBytes,
+-    downloadFileName = modelFile,
++    downloadFileName = localFile,
+     version = commitHash,
+     configs = mutableListOf(SD_STEPS_CONFIG, SD_CFG_CONFIG),
+-    learnMoreUrl = "https://huggingface.co/$modelId",
++    learnMoreUrl = "",
+     showBenchmarkButton = false,
+     showRunAgainButton = false,
+ )
+@@ -67,23 +70,25 @@ class ImageGenTask @Inject constructor() : CustomTask {
+         label = "Image Gen",
+         category = Category.IMAGE_GEN,
+         icon = Icons.Outlined.AutoAwesome,
+-        description = "Generate images from text prompts using on-device Stable Diffusion",
++        description = "Create images from a text prompt, entirely on this phone.",
+         shortDescription = "On-device image generation",
+         models = mutableListOf(
+             sdModel(
+-                name = "SD 1.5 Q4_0",
++                name = "QSI Image",
+                 modelId = "second-state/stable-diffusion-v1-5-GGUF",
+                 modelFile = "stable-diffusion-v1-5-pruned-emaonly-Q4_0.gguf",
++                localFile = "qsi-image.gguf",
+                 commitHash = "main",
+-                description = "Stable Diffusion 1.5 Q4_0 quantization (~2.1 GB). Good balance of quality and size for on-device generation.",
++                description = "The QSI image engine (~2.1 GB). A good balance of quality and size; a picture takes a minute or two on a phone.",
+                 sizeInBytes = 2_127_000_000L,
+             ),
+             sdModel(
+-                name = "SD 1.5 Q8_0",
++                name = "QSI Image HD",
+                 modelId = "second-state/stable-diffusion-v1-5-GGUF",
+                 modelFile = "stable-diffusion-v1-5-pruned-emaonly-Q8_0.gguf",
++                localFile = "qsi-image-hd.gguf",
+                 commitHash = "main",
+-                description = "Stable Diffusion 1.5 Q8_0 quantization (~4.0 GB). Higher quality on devices with sufficient RAM.",
++                description = "The higher-quality QSI image engine (~4.0 GB). Needs a phone with plenty of RAM.",
+                 sizeInBytes = 4_028_000_000L,
+             ),
+         ),
+@@ -104,7 +109,7 @@ class ImageGenTask @Inject constructor() : CustomTask {
+                 model.instance = sd
+                 onDone("")
+             } else {
+-                onDone("Failed to load Stable Diffusion model from $modelPath")
++                onDone("QSI Image could not be loaded. Try downloading it again.")
+             }
+         }
+     }
+diff --git a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/imagegen/ImageGenViewModel.kt b/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/imagegen/ImageGenViewModel.kt
+index 597fef6..7248af7 100644
+--- a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/imagegen/ImageGenViewModel.kt
++++ b/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/imagegen/ImageGenViewModel.kt
+@@ -84,7 +84,7 @@ class ImageGenViewModel @Inject constructor() : ViewModel() {
+             val values = ContentValues().apply {
+                 put(MediaStore.Images.Media.DISPLAY_NAME, fileName)
+                 put(MediaStore.Images.Media.MIME_TYPE, "image/png")
+-                put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + "/LocalDiffusion")
++                put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + "/QSI Offline")
+             }
+             val uri = context.contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
+             uri?.let {
 diff --git a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/llmchat/LlmChatModelHelper.kt b/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/llmchat/LlmChatModelHelper.kt
 index 661fd37..a15b80b 100644
 --- a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/llmchat/LlmChatModelHelper.kt
@@ -856,17 +1065,16 @@ index 1e45e29..e79639d 100644
      Box() {
        LazyColumn(
 diff --git a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/modelmanager/ModelManagerViewModel.kt b/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/modelmanager/ModelManagerViewModel.kt
-index 07b6303..ef828a4 100644
+index 07b6303..7d32f53 100644
 --- a/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/modelmanager/ModelManagerViewModel.kt
 +++ b/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/modelmanager/ModelManagerViewModel.kt
-@@ -78,6 +78,21 @@ import net.openid.appauth.ResponseTypeValues
+@@ -78,6 +78,23 @@ import net.openid.appauth.ResponseTypeValues
  
  private const val TAG = "AGModelManagerViewModel"
  private const val TEXT_INPUT_HISTORY_MAX_SIZE = 50
 +/**
-+ * QSI Offline ships only the features its two preset models power. Everything else Box
-+ * registers (image generation, the demo games, the example task) needs other models, whose
-+ * names would surface in the UI.
++ * QSI Offline registers every Box feature whose models are preset under a QSI name. Only the
++ * developer example task is left out.
 + */
 +private val QSI_ENABLED_TASK_IDS =
 +  setOf(
@@ -876,12 +1084,15 @@ index 07b6303..ef828a4 100644
 +    BuiltInTaskId.LLM_ASK_AUDIO,
 +    BuiltInTaskId.LLM_AGENT_CHAT,
 +    BuiltInTaskId.WHISPER,
++    BuiltInTaskId.IMAGE_GEN,
++    BuiltInTaskId.LLM_TINY_GARDEN,
++    BuiltInTaskId.LLM_MOBILE_ACTIONS,
 +  )
 +
  private const val MODEL_ALLOWLIST_FILENAME = "model_allowlist.json"
  private const val MODEL_ALLOWLIST_TEST_FILENAME = "model_allowlist_test.json"
  private const val ALLOWLIST_BASE_URL =
-@@ -219,7 +234,7 @@ constructor(
+@@ -219,7 +236,7 @@ constructor(
    }
  
    fun getActiveCustomTasks(): List<CustomTask> {
@@ -1403,10 +1614,18 @@ index 69b30fb..686cb0e 100644
    </style>
    <style name="Theme.Gallery.OssLicenses" parent="Theme.AppCompat">
 diff --git a/Android/src/app/src/main/res/values/strings.xml b/Android/src/app/src/main/res/values/strings.xml
-index dd16e90..8d056fe 100644
+index dd16e90..dbd3711 100644
 --- a/Android/src/app/src/main/res/values/strings.xml
 +++ b/Android/src/app/src/main/res/values/strings.xml
-@@ -26,15 +26,15 @@
+@@ -20,21 +20,21 @@
+   <string name="add" translatable="false">Add</string>
+   <string name="added" translatable="false">Added</string>
+   <string name="add_audio" translatable="false">+Audio</string>
+-  <string name="aicore_access_panel_title" translatable="false">You cannot access this model yet. Please follow the steps and return when complete.</string>
+-  <string name="aicore_access_panel_button" translatable="false">Open guide</string>
++  <string name="aicore_access_panel_title" translatable="false">QSI Nano is not available on this phone yet.</string>
++  <string name="aicore_access_panel_button" translatable="false">Learn more</string>
+   <string name="aicore_image_limit_message" translatable="false">The current model can only support 1 image per chat. To ask about another image, create a new chat.</string>
    <string name="aichat_initializing_title" translatable="false">Initializing model</string>
    <string name="aichat_initializing_content" translatable="false">Sit tight, this can take up to 1 minute</string>
    <string name="app_intro" translatable="false">Explore a world of amazing on-device models from</string>

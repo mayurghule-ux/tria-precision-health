@@ -1,2 +1,6 @@
 https://huggingface.co/litert-community/gemma-4-E2B-it-litert-lm/resolve/7fa1d78473894f7e736a21d920c3aa80f950c0db/gemma-4-E2B-it.litertlm?download=true
 https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-large-v3-turbo-q5_0.bin?download=true
+https://huggingface.co/second-state/stable-diffusion-v1-5-GGUF/resolve/main/stable-diffusion-v1-5-pruned-emaonly-Q4_0.gguf?download=true
+https://huggingface.co/second-state/stable-diffusion-v1-5-GGUF/resolve/main/stable-diffusion-v1-5-pruned-emaonly-Q8_0.gguf?download=true
+https://huggingface.co/litert-community/functiongemma-270m-ft-tiny-garden/resolve/c205853ff82da86141a1105faa2344a8b176dfe7/tiny_garden_q8_ekv1024.litertlm?download=true
+https://huggingface.co/jegly/mobile_actions_q8_ekv1024.litertlm/resolve/main/mobile_actions_q8_ekv1024.litertlm?download=true

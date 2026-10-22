@@ -9,7 +9,11 @@ kept here as a patch so the upstream code stays untouched and easy to update.
 | In the app | Behind it |
 | --- | --- |
 | **QSI Core** — chat, prompt lab, ask about a photo, ask about audio, agent chat with on-device tools | Gemma 4 E2B (LiteRT-LM), Apache 2.0, pinned to an exact upstream commit |
+| **QSI Nano** — lighter text chat using the AI built into recent phones, nothing to download | Google's on-device model through AICore / ML Kit GenAI; offered everywhere, the phone reports whether it has it |
 | **QSI Voice** — speech to text, language detected automatically | Whisper large-v3-turbo, 5-bit (whisper.cpp), MIT |
+| **QSI Image / QSI Image HD** — pictures from a text prompt | Stable Diffusion 1.5, Q4_0 / Q8_0 GGUF (stable-diffusion.cpp) |
+| **QSI Garden** — a game that shows the assistant calling functions | FunctionGemma 270M fine-tune (LiteRT-LM) |
+| **QSI Actions** — phone actions from a plain-language request | FunctionGemma 270M fine-tune by Jegly (LiteRT-LM) |
 
 Model names never appear in the app. Both models are downloaded once from inside the
 app, then everything runs offline. Nothing typed, spoken or photographed leaves the

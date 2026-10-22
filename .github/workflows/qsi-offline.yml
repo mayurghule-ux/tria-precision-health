@@ -94,7 +94,7 @@ jobs:
           models = json.load(sys.stdin)["models"]
           names = [m["name"] for m in models]
           print("allowlisted models:", names)
-          assert names == ["QSI Core"], names
+          assert names == ["QSI Core", "QSI Nano", "QSI Garden", "QSI Actions"], names
           '
 
           # Upstream display names that must not reach the UI. Grep a file rather
@@ -103,6 +103,8 @@ jobs:
           DEX_STRINGS="$RUNNER_TEMP/dex-strings.txt"
           unzip -p "$APK" 'classes*.dex' | strings > "$DEX_STRINGS"
           for banned in "Whisper Tiny" "Whisper Base" "Whisper Small" "Gemma-4-E2B-it" \
+                        "SD 1.5 Q4_0" "SD 1.5 Q8_0" "TinyGarden-270M" "MobileActions-270M" \
+                        "Function Gemma" "Stable Diffusion" \
                         "Box is a privacy-focused fork" "Developed by Jegly"; do
             if grep -qF "$banned" "$DEX_STRINGS"; then
               echo "::error::found upstream name in the app: $banned"; exit 1
